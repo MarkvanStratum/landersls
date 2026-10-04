@@ -1,3 +1,4 @@
+import multer from 'multer';
 import express from 'express';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -1160,6 +1161,797 @@ app.get("/payment-result", (req, res) => {
 </html>
   `);
 });
+
+function requireAdminPassword(req, res, next) {
+  const enteredPassword =
+    req.headers["x-admin-password"] || "";
+
+  const correctPassword =
+    process.env.ADMIN_DASHBOARD_PASSWORD || "";
+
+  if (
+    !correctPassword ||
+    enteredPassword !== correctPassword
+  ) {
+    return res.status(401).json({
+      error: "Incorrect admin password"
+    });
+  }
+
+  next();
+}
+
+// --------------------------------------------
+// CSV HELPERS FOR CHARGEBACK IMPORT
+// --------------------------------------------
+
+function parseCsvLine(line) {
+  const result = [];
+  let current = "";
+  let insideQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      if (
+        insideQuotes &&
+        line[i + 1] === '"'
+      ) {
+        current += '"';
+        i++;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
+
+      continue;
+    }
+
+    if (char === "," && !insideQuotes) {
+      result.push(current);
+      current = "";
+      continue;
+    }
+
+    current += char;
+  }
+
+  result.push(current);
+
+  return result;
+}
+
+function parseChargebackCsv(csvText) {
+  const lines =
+    String(csvText || "")
+      .replace(/^\uFEFF/, "")
+      .split(/\r?\n/)
+      .filter(line => line.trim() !== "");
+
+  if (lines.length < 2) {
+    return [];
+  }
+
+  const headers =
+    parseCsvLine(lines[0])
+      .map(header => header.trim());
+
+  return lines.slice(1).map(line => {
+    const values = parseCsvLine(line);
+
+    const row = {};
+
+    headers.forEach((header, index) => {
+      row[header] =
+        values[index] !== undefined
+          ? values[index].trim()
+          : "";
+    });
+
+    return row;
+  });
+}
+
+function parsePaystraxDate(value) {
+  const text =
+    String(value || "")
+      .replace(/\D/g, "");
+
+  if (text.length !== 8) {
+    return null;
+  }
+
+  return (
+    text.slice(0, 4) +
+    "-" +
+    text.slice(4, 6) +
+    "-" +
+    text.slice(6, 8)
+  );
+}
+
+function getChargebackCardParts(maskedCard) {
+  const text = String(maskedCard || "").trim();
+
+  const binMatch =
+    text.match(/^(\d{6})/);
+
+  const lastFourMatch =
+    text.match(/(\d{4})$/);
+
+  return {
+    cardBin:
+      binMatch
+        ? binMatch[1]
+        : null,
+
+    lastFour:
+      lastFourMatch
+        ? lastFourMatch[1]
+        : null
+  };
+}
+const chargebackUpload=multer({storage:multer.memoryStorage(),limits:{fileSize:5*1024*1024}});
+app.post(
+  "/api/admin/chargebacks/upload",
+  requireAdminPassword,
+  chargebackUpload.single("file"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          error: "No CSV file uploaded"
+        });
+      }
+
+      const csvText =
+        req.file.buffer.toString("utf8");
+
+      const rows =
+        parseChargebackCsv(csvText);
+
+      if (!rows.length) {
+        return res.status(400).json({
+          success: false,
+          error: "The CSV contains no chargeback rows"
+        });
+      }
+
+      let imported = 0;
+      let updated = 0;
+      let skipped = 0;
+      let matched = 0;
+
+      for (const row of rows) {
+        const caseId =
+          String(
+            row["Case ID/Scheme ID"] || ""
+          ).trim();
+
+        if (!caseId) {
+          skipped++;
+          continue;
+        }
+
+        // This is the LegendSpeak CRM.
+        // Ignore cases belonging to the other merchant/site.
+        const merchantName =
+          String(
+            row["Merchant Name"] || ""
+          )
+            .trim()
+            .toUpperCase();
+
+        if (merchantName !== "LEGENDSPEAK.NET") {
+          skipped++;
+          continue;
+        }
+
+        // The Chargebacks tab should contain actual chargebacks only.
+        // RDR cases are a different dispute type and should not inflate
+        // the chargeback count.
+        const caseKind =
+          String(
+            row["Kind"] || ""
+          )
+            .trim()
+            .toUpperCase();
+
+        if (caseKind !== "CBK1") {
+          skipped++;
+          continue;
+        }
+
+        const {
+          cardBin,
+          lastFour
+        } = getChargebackCardParts(
+          row["Card No."]
+        );
+
+        // Paystrax already tells us the card network.
+        // Do not depend on transaction matching just to know Visa/Mastercard.
+        const networkCode =
+          String(
+            row["Ntwk"] || ""
+          )
+            .trim()
+            .toUpperCase();
+
+        const csvCardType =
+          networkCode === "VI"
+            ? "VISA"
+            : networkCode === "MC"
+              ? "MASTERCARD"
+              : networkCode || null;
+
+        const transactionDate =
+          parsePaystraxDate(
+            row["Transaction Date"]
+          );
+
+        const amount =
+          Number(
+            row["Merchant Funding Amt Gr"] ||
+            row["Netwk Sett Amt"] ||
+            0
+          );
+
+        const currency =
+          String(
+            row["Merchant Funding Currency"] ||
+            row["Netwk Sett Curr"] ||
+            ""
+          )
+            .trim()
+            .toUpperCase();
+
+        let matchedPayment = null;
+
+        if (
+          cardBin &&
+          lastFour &&
+          Number.isFinite(amount)
+        ) {
+          const matchResult =
+            await pool.query(
+              `
+              SELECT
+                p.reference,
+                p.email,
+                p.plan,
+                p.affiliate_source,
+                p.amount,
+
+                COALESCE(
+                  p.card_type,
+                  a.card_type
+                ) AS card_type,
+
+                COALESCE(
+                  p.xolvis_payload #>> '{returnData,binCountry}',
+                  p.xolvis_payload #>> '{returnData,binRawData,data,country_alpha2}',
+                  p.xolvis_payload #>> '{customer,binCountry}',
+                  p.xolvis_payload->>'binCountry'
+                ) AS card_country
+
+              FROM xolvis_payments p
+
+              LEFT JOIN card_payment_attempts a
+                ON a.payment_reference = p.reference
+
+              WHERE
+                LEFT(
+                  REGEXP_REPLACE(
+                    COALESCE(
+                      p.card_bin,
+                      a.card_bin,
+                      ''
+                    ),
+                    '[^0-9]',
+                    '',
+                    'g'
+                  ),
+                  6
+                ) = $1
+
+                AND RIGHT(
+                  REGEXP_REPLACE(
+                    COALESCE(
+                      p.last_four,
+                      a.last_four,
+                      ''
+                    ),
+                    '[^0-9]',
+                    '',
+                    'g'
+                  ),
+                  4
+                ) = $2
+
+                AND ABS(
+                  COALESCE(p.amount, 0) - $3
+                ) < 0.01
+
+                AND (
+                  UPPER(
+                    COALESCE(
+                      a.status,
+                      ''
+                    )
+                  ) = 'SUCCESSFUL'
+
+                  OR
+
+                  UPPER(
+                    COALESCE(
+                      p.status,
+                      ''
+                    )
+                  ) IN (
+                    'FINISHED',
+                    'OK',
+                    'SUCCESSFUL'
+                  )
+                )
+
+              ORDER BY
+                COALESCE(
+                  p.paid_at,
+                  p.created_at
+                ) DESC
+
+              LIMIT 1
+              `,
+              [
+                cardBin,
+                lastFour,
+                amount
+              ]
+            );
+
+          if (matchResult.rows.length) {
+            matchedPayment =
+              matchResult.rows[0];
+
+            matched++;
+          }
+        }        const existing =
+          await pool.query(
+            `
+            SELECT id
+            FROM chargebacks
+            WHERE case_id = $1
+            LIMIT 1
+            `,
+            [caseId]
+          );
+
+        await pool.query(
+          `
+          INSERT INTO chargebacks
+          (
+            case_id,
+            status,
+            network,
+            card_bin,
+            last_four,
+            reason_code,
+            dispute_condition,
+            transaction_date,
+            merchant_transaction_reference,
+            merchant_name,
+            currency,
+            amount,
+            matched_payment_reference,
+            card_country,
+            affiliate_source,
+            plan,
+            card_type,
+            email
+          )
+          VALUES
+          (
+            $1,$2,$3,$4,$5,$6,$7,$8,$9,
+            $10,$11,$12,$13,$14,$15,$16,
+            $17,$18
+          )
+
+          ON CONFLICT (case_id)
+          DO UPDATE SET
+            status = EXCLUDED.status,
+            network = EXCLUDED.network,
+            card_bin = EXCLUDED.card_bin,
+            last_four = EXCLUDED.last_four,
+            reason_code = EXCLUDED.reason_code,
+            dispute_condition = EXCLUDED.dispute_condition,
+            transaction_date = EXCLUDED.transaction_date,
+            merchant_transaction_reference =
+              EXCLUDED.merchant_transaction_reference,
+            merchant_name = EXCLUDED.merchant_name,
+            currency = EXCLUDED.currency,
+            amount = EXCLUDED.amount,
+
+            matched_payment_reference =
+              COALESCE(
+                EXCLUDED.matched_payment_reference,
+                chargebacks.matched_payment_reference
+              ),
+
+            card_country =
+              COALESCE(
+                EXCLUDED.card_country,
+                chargebacks.card_country
+              ),
+
+            affiliate_source =
+              COALESCE(
+                EXCLUDED.affiliate_source,
+                chargebacks.affiliate_source
+              ),
+
+            plan =
+              COALESCE(
+                EXCLUDED.plan,
+                chargebacks.plan
+              ),
+
+            card_type =
+              COALESCE(
+                EXCLUDED.card_type,
+                chargebacks.card_type
+              ),
+
+            email =
+              COALESCE(
+                EXCLUDED.email,
+                chargebacks.email
+              )
+          `,
+          [
+            caseId,
+            row["Status"] || null,
+            row["Ntwk"] || null,
+            cardBin,
+            lastFour,
+            row["Reason Code"] || null,
+            row["Dispute Condition"] || null,
+            transactionDate,
+            row["Merch Tran Ref."] || null,
+            row["Merchant Name"] || null,
+            currency || null,
+            Number.isFinite(amount)
+              ? amount
+              : null,
+            matchedPayment?.reference || null,
+            matchedPayment?.card_country || null,
+            matchedPayment?.affiliate_source || null,
+            matchedPayment?.plan || null,
+            matchedPayment?.card_type || csvCardType || null,
+            matchedPayment?.email || null
+          ]
+        );
+
+        if (existing.rows.length) {
+          updated++;
+        } else {
+          imported++;
+        }
+      }
+
+      return res.json({
+        success: true,
+        totalRows: rows.length,
+        imported,
+        updated,
+        skipped,
+        matched
+      });
+
+    } catch (error) {
+      console.error(
+        "Chargeback CSV import error:",
+        error
+      );
+
+      return res.status(500).json({
+        success: false,
+        error: "Could not import chargeback CSV"
+      });
+    }
+  }
+);
+app.get(
+  "/api/admin/chargebacks",
+  requireAdminPassword,
+  async (req, res) => {
+    try {
+      const result =
+        await pool.query(
+          `
+          SELECT
+            id,
+            case_id,
+            status,
+            network,
+            card_bin,
+            last_four,
+            reason_code,
+            dispute_condition,
+            transaction_date,
+            merchant_transaction_reference,
+            merchant_name,
+            currency,
+            amount,
+            matched_payment_reference,
+            card_country,
+            affiliate_source,
+            plan,
+            card_type,
+            email,
+            imported_at
+
+          FROM chargebacks
+
+          WHERE
+            UPPER(
+              TRIM(
+                COALESCE(
+                  merchant_name,
+                  ''
+                )
+              )
+            ) = 'LEGENDSPEAK.NET'
+
+          ORDER BY
+            transaction_date DESC,
+            imported_at DESC          `
+        );
+
+      return res.json({
+        success: true,
+        chargebacks: result.rows
+      });
+
+    } catch (error) {
+      console.error(
+        "Admin chargebacks error:",
+        error
+      );
+
+      return res.status(500).json({
+        success: false,
+        error: "Could not load chargebacks"
+      });
+    }
+  }
+);
+app.post(
+  "/api/admin/transactions/:reference/refund",
+  requireAdminPassword,
+  async (req, res) => {
+    const reference = req.params.reference;
+    if (!reference || reference.length > 250) {
+      return res.status(400).json({ error: "Invalid payment reference" });
+    }
+
+    let refundReference;
+
+    try {
+      const paymentResult = await pool.query(
+        `SELECT reference, email, amount, xolvis_uuid, status, paid_at
+         FROM xolvis_payments
+         WHERE reference = $1`,
+        [reference]
+      );
+
+      const payment = paymentResult.rows[0];
+
+      if (
+        !payment ||
+        !payment.paid_at ||
+        !payment.xolvis_uuid ||
+        !["FINISHED", "OK", "SUCCESSFUL"].includes(
+          String(payment.status).toUpperCase()
+        )
+      ) {
+        return res.status(400).json({
+          error: "A completed payment with a Xolvis UUID is required"
+        });
+      }
+
+      refundReference = `refund-${crypto.randomUUID()}`;
+
+      const reserved = await pool.query(
+        `INSERT INTO xolvis_refunds
+           (payment_reference, refund_reference, amount)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (payment_reference) DO NOTHING
+         RETURNING refund_reference`,
+        [reference, refundReference, payment.amount]
+      );
+
+      if (!reserved.rowCount) {
+        return res.status(409).json({
+          error: "A refund request already exists for this payment. Check its status before taking further action."
+        });
+      }
+
+      const gatewayResponse = await fetch(
+        `${process.env.XOLVIS_BASE_URL}/transaction/${process.env.XOLVIS_CONNECTOR_API_KEY}/refund`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: getXolvisAuthHeader(),
+            "Content-Type": "application/json; charset=utf-8",
+            Accept: "application/json"
+          },
+          body: JSON.stringify({
+            merchantTransactionId: refundReference,
+            amount: Number(payment.amount).toFixed(2),
+            currency: "GBP",
+            referenceUuid: payment.xolvis_uuid,
+            callbackUrl: process.env.XOLVIS_CALLBACK_URL
+          })
+        }
+      );
+
+      const raw = await gatewayResponse.text();
+      let result;
+
+      try {
+        result = JSON.parse(raw);
+      } catch {
+        result = { message: raw.slice(0, 1000) };
+      }
+
+      const status =
+        gatewayResponse.ok &&
+result.success === true &&
+!["ERROR", "DECLINED"].includes(
+  String(result.returnType || "").toUpperCase()
+)
+          ? String(result.returnType || "PENDING").toUpperCase()
+          : "REVIEW_REQUIRED";
+
+      await pool.query(
+        `UPDATE xolvis_refunds
+         SET status = $1,
+             refund_uuid = $2,
+             gateway_response = $3,
+             updated_at = NOW()
+         WHERE refund_reference = $4
+           AND status = 'SUBMITTING'`,
+        [status, result.uuid || null, result, refundReference]
+      );
+
+      if (status === "REVIEW_REQUIRED") {
+        console.error(
+          "Xolvis refund needs review:",
+          refundReference,
+          gatewayResponse.status,
+          result
+        );
+        return res.status(502).json({
+          error: "Gateway did not confirm the refund request. Check Xolvis before retrying.",
+          refundReference
+        });
+      }
+
+      return res.json({ success: true, refundReference, status });
+    } catch (error) {
+      console.error("Refund request needs review:", refundReference, error);
+
+      if (refundReference) {
+        await pool.query(
+          `UPDATE xolvis_refunds
+           SET status = 'REVIEW_REQUIRED', updated_at = NOW()
+           WHERE refund_reference = $1 AND status = 'SUBMITTING'`,
+          [refundReference]
+        ).catch(console.error);
+      }
+
+      return res.status(500).json({
+        error: "Refund result uncertain; check Xolvis using the refund reference before retrying.",
+        refundReference
+      });
+    }
+  }
+);
+app.get(
+  "/api/admin/transactions",
+  requireAdminPassword,
+  async (req, res) => {
+    try {
+      const result = await pool.query(`
+  SELECT
+    COALESCE(
+      p.reference,
+      a.payment_reference
+    ) AS reference,
+
+    COALESCE(
+      p.email,
+      a.email
+    ) AS email,
+
+    p.plan,
+    p.amount,
+
+    COALESCE(
+      p.status,
+      a.status
+    ) AS payment_status,
+
+    COALESCE(
+      p.created_at,
+      a.created_at
+    ) AS created_at,
+
+p.xolvis_uuid,
+p.paid_at,
+r.refund_reference,
+r.status AS refund_status,
+r.refund_uuid,
+p.affiliate_source,
+p.traffic_source,
+p.sub_id,
+
+COALESCE(p.card_bin, a.card_bin) AS card_bin,
+COALESCE(p.card_type, a.card_type) AS card_type,
+COALESCE(p.last_four, a.last_four) AS last_four,
+a.status AS attempt_status,
+a.gateway_status,
+COALESCE(
+  p.xolvis_payload #>> '{returnData,binCountry}',
+  p.xolvis_payload #>> '{returnData,binRawData,data,country_alpha2}',
+  p.xolvis_payload #>> '{customer,binCountry}',
+  p.xolvis_payload->>'binCountry'
+) AS card_country,
+
+COALESCE(
+  p.xolvis_payload->>'adapterMessage',
+  p.xolvis_payload->>'message',
+  p.xolvis_payload->>'result',
+  a.gateway_status,
+  a.status,
+  p.status
+) AS reason
+
+  FROM xolvis_payments p
+
+LEFT JOIN xolvis_refunds r
+  ON r.payment_reference = p.reference
+
+FULL OUTER JOIN card_payment_attempts a
+    ON a.payment_reference = p.reference
+
+  ORDER BY COALESCE(
+    p.created_at,
+    a.created_at
+  ) DESC
+`);
+
+      res.json({
+        success: true,
+        transactions: result.rows
+      });
+
+    } catch (error) {
+      console.error(
+        "Admin transactions error:",
+        error
+      );
+
+      res.status(500).json({
+        success: false,
+        error: "Could not load transactions"
+      });
+    }
+  }
+);
+
  app.use(express.static(publicDir));
  return app;
 }

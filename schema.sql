@@ -20,3 +20,65 @@ CREATE TABLE IF NOT EXISTS promo_funnel_events (
 ALTER TABLE promo_funnel_events ADD COLUMN IF NOT EXISTS event_details TEXT;
 CREATE INDEX IF NOT EXISTS idx_promo_funnel_event_name ON promo_funnel_events(event_name);
 CREATE INDEX IF NOT EXISTS idx_promo_funnel_created_at ON promo_funnel_events(created_at);
+
+CREATE TABLE IF NOT EXISTS card_payment_attempts (
+    id BIGSERIAL PRIMARY KEY,
+    payment_reference TEXT UNIQUE,
+    fingerprint_hash TEXT NOT NULL,
+    card_bin TEXT,
+    card_type TEXT,
+    last_four TEXT,
+    email TEXT,
+    status TEXT NOT NULL DEFAULT 'CREATED',
+    gateway_status TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
+
+CREATE TABLE IF NOT EXISTS chargebacks (
+    id BIGSERIAL PRIMARY KEY,
+
+    case_id TEXT UNIQUE NOT NULL,
+
+    status TEXT,
+    network TEXT,
+
+    card_bin TEXT,
+    last_four TEXT,
+
+    reason_code TEXT,
+    dispute_condition TEXT,
+
+    transaction_date DATE,
+
+    merchant_transaction_reference TEXT,
+
+    merchant_name TEXT,
+
+    currency TEXT,
+    amount NUMERIC(12,2),
+
+    matched_payment_reference TEXT,
+
+    card_country TEXT,
+    affiliate_source TEXT,
+    plan TEXT,
+    card_type TEXT,
+    email TEXT,
+
+    imported_at TIMESTAMP DEFAULT NOW()
+  );
+
+CREATE TABLE IF NOT EXISTS xolvis_refunds (
+    id BIGSERIAL PRIMARY KEY,
+    payment_reference TEXT NOT NULL UNIQUE
+      REFERENCES xolvis_payments(reference),
+    refund_reference TEXT NOT NULL UNIQUE,
+    amount NUMERIC(10,2) NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'GBP',
+    status TEXT NOT NULL DEFAULT 'SUBMITTING',
+    refund_uuid TEXT,
+    gateway_response JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
