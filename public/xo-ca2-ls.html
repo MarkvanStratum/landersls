@@ -602,6 +602,31 @@ payNow.onclick = () => {
     data.returnType === "REDIRECT" &&
     data.redirectUrl
 ) {
+    if (data.redirectType === "iframe") {
+        overlay.setAttribute("aria-hidden", "true");
+
+        const iframe = document.createElement("iframe");
+
+        iframe.src = data.redirectUrl;
+        iframe.style.position = "fixed";
+        iframe.style.top = "0";
+        iframe.style.left = "0";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "0";
+        iframe.style.zIndex = "10000";
+        iframe.style.background = "#fff";
+
+        iframe.setAttribute(
+            "allow",
+            "payment *"
+        );
+
+        document.body.appendChild(iframe);
+
+        return;
+    }
+
     window.location.href =
         data.redirectUrl;
 
@@ -614,7 +639,6 @@ if (data.paymentResultUrl) {
 
     return;
 }
-
 throw new Error(
     "Unable to verify payment status."
 );
