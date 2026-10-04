@@ -840,6 +840,145 @@ res.json({
     res.status(500).json({ error: "Could not create promo payment" });
   }
 });
+
+// --------------------------------------------
+// XOLVIS WEBHOOK
+// --------------------------------------------
+
+app.get("/xolvis-webhook", (req, res) => {
+  console.log("XOLVIS WEBHOOK GET TEST");
+  res.send("Xolvis webhook endpoint is reachable");
+});
+
+app.post("/xolvis-webhook", async (req, res) => {
+  try {
+    const data = req.body;
+
+    console.log("XOLVIS WEBHOOK:");
+    console.log(JSON.stringify(data, null, 2));
+
+    const reference =
+      data?.merchantTransactionId ||
+      data?.merchantTransactionID ||
+      data?.transaction?.merchantTransactionId ||
+      data?.reference ||
+      null;
+
+    const uuid =
+      data?.uuid ||
+      data?.transactionUuid ||
+      data?.transaction?.uuid ||
+      null;
+
+    const status =
+      data?.result ||
+      data?.returnType ||
+      data?.status ||
+      data?.transaction?.status ||
+      "UNKNOWN";
+
+    const isSuccessful =
+      data?.result === "OK" ||
+      data?.returnType === "FINISHED" ||
+      data?.status === "FINISHED" ||
+      data?.transaction?.status === "FINISHED";
+
+    if (!reference && !uuid) {
+      console.error("XOLVIS WEBHOOK: Missing reference/uuid");
+
+      return res.status(400).json({
+        error: "Missing payment reference"
+      });
+    }
+
+    const paymentResult = await pool.query(
+      `
+      SELECT *
+      FROM xolvis_payments
+      WHERE reference = $1
+         OR xolvis_uuid = $2
+      LIMIT 1
+      `,
+      [
+        reference,
+        uuid
+      ]
+    );
+
+    if (paymentResult.rows.length === 0) {
+      console.error(
+        "XOLVIS WEBHOOK: Payment not found:",
+        reference,
+        uuid
+      );
+
+      return res.json({
+        ok: true
+      });
+    }
+
+    const payment = paymentResult.rows[0];
+
+    await pool.query(
+      `
+      UPDATE xolvis_payments
+      SET
+        status = $1,
+        xolvis_payload = $2,
+        xolvis_uuid = COALESCE($3, xolvis_uuid),
+        paid_at =
+          CASE
+            WHEN $4 = true
+            THEN COALESCE(paid_at, NOW())
+            ELSE paid_at
+          END
+      WHERE id = $5
+      `,
+      [
+        status,
+        data,
+        uuid,
+        isSuccessful,
+        payment.id
+      ]
+    );
+
+    await pool.query(
+      `
+      UPDATE card_payment_attempts
+      SET
+        status = $1,
+        gateway_status = $2,
+        updated_at = NOW()
+      WHERE payment_reference = $3
+      `,
+      [
+        isSuccessful ? "SUCCESSFUL" : "FAILED",
+        status,
+        payment.reference
+      ]
+    );
+
+    console.log(
+      "XOLVIS WEBHOOK UPDATED:",
+      payment.reference,
+      status,
+      isSuccessful ? "SUCCESSFUL" : "FAILED"
+    );
+
+    return res.json({
+      ok: true
+    });
+
+  } catch (error) {
+    console.error("XOLVIS WEBHOOK ERROR:", error);
+
+    return res.status(500).json({
+      error: "Webhook processing failed"
+    });
+  }
+});
+
 app.get("/api/payment-result-status", async (req, res) => {
   try {
     const reference =

@@ -11,8 +11,6 @@ if(!process.env.XOLVIS_ERROR_URL && !process.env.XOLVIS_CANCEL_URL) throw new Er
 if(!process.env.XOLVIS_SUCCESS_URL && !process.env.XOLVIS_SUCCESS_URL_3795) console.warn('Set a default success URL for pages that do not supply one.');
 const appUrl=new URL(process.env.APP_URL);
 if(appUrl.protocol !== 'https:' && process.env.NODE_ENV === 'production') throw new Error('APP_URL must use https');
-const callbackUrl=new URL(process.env.XOLVIS_CALLBACK_URL);
-if(callbackUrl.hostname === appUrl.hostname) throw new Error('Use the existing LegendSpeak callback URL. This checkout-only app does not handle webhooks.');
 const dbUrl=new URL(process.env.DATABASE_URL);
 const ca=process.env.DATABASE_CA_CERT?.replace(/\\n/g,'\n');
 if(ca) for(const key of ['sslmode','sslcert','sslkey','sslrootcert']) dbUrl.searchParams.delete(key);
