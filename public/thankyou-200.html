@@ -184,7 +184,7 @@
     var goaffproOrder = {
       id: orderId,            // string
       number: orderId,        // string (can match id)
-      total: 400,             // number
+      total: 200,             // number
       currency: "USD",        // ISO code
       forceSDK: true
     };
@@ -213,7 +213,7 @@
   const qs = new URLSearchParams(location.search);
 
   const value =
-    +(qs.get("value") || qs.get("amount") || 400);
+    +(qs.get("value") || qs.get("amount") || 200);
 
   const currency =
     (qs.get("currency") || "USD").toUpperCase();
