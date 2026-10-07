@@ -275,7 +275,7 @@ nextBtn.onclick = async () => {
     nextBtn.textContent = "Creazione del checkout sicuro…";
     overlay.setAttribute("aria-hidden", "false");
 
-    const response = await fetch("https://www.1654-1654-legendspeak.ai/api/create-promo-checkout-link", {
+    const response = await fetch("/api/create-promo-checkout-link", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -313,7 +313,7 @@ successUrl: "https://cudsr.bemobtrcks.com/go/abc281a7-e82a-411b-8b56-1a0228d7d2e
     }
 
     let nextUrl =
-  "https://www.1654-1654-legendspeak.ai" +
+  "https://www.legendspeak.net" +
   data.url +
   "?ref=" + encodeURIComponent(affiliateRef || "") +
   "&sub1=" + encodeURIComponent(qs.get("sub1") || "") +
