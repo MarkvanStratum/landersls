@@ -273,7 +273,7 @@ nextBtn.onclick = async () => {
     nextBtn.textContent = "جاري إنشاء رابط الدفع الآمن…";
     overlay.setAttribute("aria-hidden", "false");
 
-    const response = await fetch("https://www.1654-1654-legendspeak.ai/api/create-promo-checkout-link", {
+    const response = await fetch("https://1654-legendspeak.ai/api/create-promo-checkout-link", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -311,7 +311,7 @@ successUrl: "https://cudsr.bemobtrcks.com/go/308711f6-aa26-4399-99b8-0d21edcd75f
     }
 
     let nextUrl =
-  "https://www.1654-1654-legendspeak.ai" +
+  "https://1654-legendspeak.ai" +
   data.url +
   "?ref=" + encodeURIComponent(affiliateRef || "") +
   "&sub1=" + encodeURIComponent(qs.get("sub1") || "") +
