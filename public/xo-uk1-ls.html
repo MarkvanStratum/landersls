@@ -275,7 +275,7 @@ nextBtn.onclick = async () => {
     nextBtn.textContent = "Creating secure checkout…";
     overlay.setAttribute("aria-hidden", "false");
 
-    const response = await fetch("https://www.1654-1654-legendspeak.ai/api/create-promo-checkout-link", {
+    const response = await fetch("/api/create-promo-checkout-link", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -302,7 +302,7 @@ nextBtn.onclick = async () => {
 
         ref: affiliateRef,
 originalQueryString: sessionStorage.getItem("orig_qs") || "",
-successUrl: "https://cudsr.bemobtrcks.com/go/f6ea7b90-4dfb-4b2a-b530-9c788795c1c0"
+successUrl: "https://cudsr.bemobtrcks.com/go/40f5ab33-ff2e-46aa-88c8-8fab25a5f548"
       })
     });
 
@@ -313,7 +313,7 @@ successUrl: "https://cudsr.bemobtrcks.com/go/f6ea7b90-4dfb-4b2a-b530-9c788795c1c
     }
 
     let nextUrl =
-  "https://www.1654-1654-legendspeak.ai" +
+  "https://www.legendspeak.net" +
   data.url +
   "?ref=" + encodeURIComponent(affiliateRef || "") +
   "&sub1=" + encodeURIComponent(qs.get("sub1") || "") +
