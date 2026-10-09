@@ -306,26 +306,39 @@ nextBtn.onclick = async () => {
       throw new Error(data.error || "No se pudo crear el enlace de pago seguro.");
     }
 
-    let nextUrl =
-  window.location.origin +
-  data.url +
-  "?ref=" + encodeURIComponent(affiliateRef || "") +
-  "&sub1=" + encodeURIComponent(qs.get("sub1") || "") +
-  "&sub2=" + encodeURIComponent(qs.get("sub2") || "") +
-  "&pixel=" + encodeURIComponent(qs.get("pixel") || "") +
-  "&clickid=" + encodeURIComponent(qs.get("clickid") || "") +
-  "&affiliate_source=" + encodeURIComponent(qs.get("affiliate_source") || "");
+    let targetUrl;
+
+if (data.url.startsWith("http://") || data.url.startsWith("https://")) {
+    targetUrl = new URL(data.url);
+} else {
+    targetUrl = new URL(data.url, window.location.origin);
+}
+
+targetUrl.searchParams.set("ref", affiliateRef || "");
+targetUrl.searchParams.set("sub1", qs.get("sub1") || "");
+targetUrl.searchParams.set("sub2", qs.get("sub2") || "");
+targetUrl.searchParams.set("pixel", qs.get("pixel") || "");
+targetUrl.searchParams.set("clickid", qs.get("clickid") || "");
+targetUrl.searchParams.set("affiliate_source", qs.get("affiliate_source") || "");
 
 const subId = qs.get("sub_id");
 
 if (subId) {
-  nextUrl += "&sub_id=" + encodeURIComponent(subId);
+    targetUrl.searchParams.set("sub_id", subId);
 }
 
-window.location.href = nextUrl;
+window.location.href = targetUrl.toString();
 
   } catch (error) {
     overlay.setAttribute("aria-hidden", "true");
     nextBtn.disabled = false;
     nextBtn.textContent = "Continuar al Pago";
     alert(error.message || "No se pudo abrir la ventana de pago seguro. Inténtalo de nuevo.");
+  }
+};
+
+});
+</script>
+
+</body>
+</html>
