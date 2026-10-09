@@ -3,12 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>الدفع الآمن</title>
+<title>الدفع الآمن — الخطوة 2</title>
 
 <meta name="referrer" content="no-referrer">
 
 <script src="https://api.goaffpro.com/loader.js?shop=nzyvwvfbde"></script>
-
 <script data-main="payment-js" src="https://api.xolvispay.com/js/integrated/payment.1.3.min.js"></script>
 <style>
 :root{--bg:#fafafa;--text:#0a2540;--muted:#5b6b82;--line:#e5e7eb;}
@@ -208,14 +207,13 @@ animation:loadingBar 2.2s ease-in-out infinite;
 @keyframes loadingBar{
 0%{width:0%}
 60%{width:80%}
-100%{width:100%}
-}
+100%{width:100%}}
 </style>
 </head>
 
 <body>
 
-<div class="safe">دفع آمن عبر تشفير SSL</div>
+<div class="safe">دفع آمن مع تشفير SSL</div>
 
 <div class="wrap">
 
@@ -228,12 +226,12 @@ animation:loadingBar 2.2s ease-in-out infinite;
 
 <div class="card">
 
-<div class="h2">2. تفاصيل الدفع</div>
-<p class="sub">معلومات البطاقة مشفرة ومعالجة بأمان تام.</p>
+<div class="h2">2. طريقة الدفع</div>
+<p class="sub">بيانات بطاقتك مشفرة وتتم معالجتها بأمان تام.</p>
 
 <div style="margin-top:14px;">
     <label for="cardholder-name" style="display:block;font-weight:700;margin-bottom:6px;">
-        الاسم الكامل لمالك البطاقة
+        الاسم الكامل لحامل البطاقة
     </label>
     <input
         type="text"
@@ -301,7 +299,7 @@ animation:loadingBar 2.2s ease-in-out infinite;
 
 <div style="display:flex;gap:10px;margin-top:12px">
 <button id="backBtn" class="btn" style="width:40%">رجوع</button>
-<button id="payNow" class="btn" style="width:60%">ادفع بأمان الآن</button>
+<button id="payNow" class="btn" style="width:60%">ادفع بأمان</button>
 </div>
 
 </div>
@@ -309,39 +307,36 @@ animation:loadingBar 2.2s ease-in-out infinite;
 <aside>
 
 <div id="productBox" class="widget" style="display:none">
-<img id="productImg"
-style="width:100%;border-radius:12px;margin-bottom:12px;display:none">
-
-<div id="productTitle"
-style="font-weight:900;font-size:18px"></div>
+<img id="productImg" style="width:100%;border-radius:12px;margin-bottom:12px;display:none">
+<div id="productTitle" style="font-weight:900;font-size:18px"></div>
 </div>
 
 <div class="widget">
-<div style="text-align:center;font-weight:800">آراء العملاء</div>
-<div style="text-align:center;font-weight:700;">فينيلة لارا</div>
+<div style="text-align:center;font-weight:800">تقييمات العملاء</div>
+<div style="text-align:center;font-weight:700;">فينيلا لارا</div>
 <div style="text-align:center;color:#f6b80c;">★★★★★</div>
-<p style="text-align:center">استلمت منتجي يوم أمس. تجربة رائعة جداً!</p>
+<p style="text-align:center">استلمت صلاحية الوصول الأمس! تجربة ممتازة للغاية!</p>
 </div>
 
 <div class="widget">
 <div class="delivery">
 <div>
-<div style="font-weight:800">توصيل سريع</div>
-<div class="sub">3–5 أيام عمل</div>
+<div style="font-weight:800">تسليم فوري</div>
+<div class="sub">وصول رقمي مباشر</div>
 </div>
-<div style="margin-right:auto;font-weight:800">مجاني</div>
+<div style="margin-right:auto;font-weight:800">مجاناً</div>
 </div>
 
 <div style="margin-top:14px;font-weight:800">ملخص الطلب</div>
-<div class="order-row"><span>المجموع</span><span>7.35 د.إ</span></div>
+<div class="order-row"><span>الإجمالي</span><span>7.35 AED</span></div>
 </div>
 
 <div class="widget">
 <div style="font-weight:800;margin-bottom:10px">لماذا تثق بنا</div>
 <div class="trust">
 <div class="box"><div>⭐</div><div>99% تقييمات إيجابية</div></div>
-<div class="box"><div>🔒</div><div>تشفير SSL آمن</div></div>
-<div class="box"><div>🛡️</div><div>تأمين بقيمة $250,000</div></div>
+<div class="box"><div>🔒</div><div>اتصال SSL آمن</div></div>
+<div class="box"><div>🛡️</div><div>ضمان محمي</div></div>
 </div>
 </div>
 
@@ -360,16 +355,11 @@ style="font-weight:900;font-size:18px"></div>
 
 <script>
 const tokenFromServer = window.PROMO_CHECKOUT_TOKEN || null;
-const publicIntegrationKey =
-    window.XOLVIS_PUBLIC_INTEGRATION_KEY || "";
+const publicIntegrationKey = window.XOLVIS_PUBLIC_INTEGRATION_KEY || "";
 
 const pageParams = new URLSearchParams(location.search);
-
-const productTitleFromUrl =
-    pageParams.get("sub1") || "";
-
-const productImageFromUrl =
-    pageParams.get("sub2") || "";
+const productTitleFromUrl = pageParams.get("sub1") || "";
+const productImageFromUrl = pageParams.get("sub2") || "";
 
 const err = document.getElementById("err");
 const payNow = document.getElementById("payNow");
@@ -391,66 +381,47 @@ function clearError() {
 
 function setLoading(isLoading) {
     payNow.disabled = isLoading;
-    overlay.setAttribute(
-        "aria-hidden",
-        isLoading ? "false" : "true"
-    );
+    overlay.setAttribute("aria-hidden", isLoading ? "false" : "true");
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    const productBox =
-        document.getElementById("productBox");
-
-    const productTitle =
-        document.getElementById("productTitle");
-
-    const productImg =
-        document.getElementById("productImg");
+    const productBox = document.getElementById("productBox");
+    const productTitle = document.getElementById("productTitle");
+    const productImg = document.getElementById("productImg");
 
     if (productTitleFromUrl) {
-        productTitle.textContent =
-            productTitleFromUrl;
-
+        productTitle.textContent = productTitleFromUrl;
         productBox.style.display = "block";
     }
 
     if (productImageFromUrl) {
-        productImg.src =
-            productImageFromUrl;
-
+        productImg.src = productImageFromUrl;
         productImg.style.display = "block";
         productBox.style.display = "block";
     }
 
     if (!tokenFromServer) {
-        showError("رابط الدفع غير صالحة أو منتهي الصلاحية.");
+        showError("رابط الدفع غير صالحة أو انتهت صلاحيته.");
         payNow.disabled = true;
         return;
     }
 
     if (!publicIntegrationKey) {
-        showError("إعدادات الدفع مفقودة.");
+        showError("إعدادات بوابات الدفع مفقودة.");
         payNow.disabled = true;
         return;
     }
 
     try {
         payment = new PaymentJs();
-
         payment.init(
             publicIntegrationKey,
             "number_div",
             "cvv_div",
             function (paymentInstance) {
                 paymentReady = true;
-
-                paymentInstance.setNumberPlaceholder(
-                    "رقم البطاقة"
-                );
-
-                paymentInstance.setCvvPlaceholder(
-                    "رمز الأمان"
-                );
+                paymentInstance.setNumberPlaceholder("رقم البطاقة");
+                paymentInstance.setCvvPlaceholder("CVV");
 
                 paymentInstance.setNumberStyle({
                     "font-size": "16px",
@@ -465,70 +436,35 @@ window.addEventListener("DOMContentLoaded", () => {
                 });
 
                 payNow.disabled = false;
-
-                console.log(
-                    "Xolvis Payment.js ready"
-                );
             }
         );
     } catch (error) {
-        console.error(
-            "Xolvis initialization error:",
-            error
-        );
-
-        showError(
-            error?.message ||
-            "تعذر تحميل حقول الدفع."
-        );
-
+        showError(error?.message || "تعذر تحميل حقول الدفع.");
         payNow.disabled = true;
     }
 });
 
-backBtn.onclick = () => {
-    window.history.back();
-};
+backBtn.onclick = () => { window.history.back(); };
 
 payNow.onclick = () => {
     clearError();
 
     if (!tokenFromServer) {
-        showError(
-            "رابط الدفع غير صالحة أو منتهي الصلاحية."
-        );
+        showError("رابط الدفع غير صالحة.");
         return;
     }
 
     if (!paymentReady || !payment) {
-        showError(
-            "حقول الدفع لا تزال قيد التحميل. يرجى الانتظار."
-        );
+        showError("جاري تحميل حقول الدفع. يرجى الانتظار.");
         return;
     }
 
-    const cardholderName =
-        document
-            .getElementById("cardholder-name")
-            .value
-            .trim();
-
-    const expMonth =
-        document
-            .getElementById("exp_month")
-            .value
-            .trim();
-
-    const expYear =
-        document
-            .getElementById("exp_year")
-            .value
-            .trim();
+    const cardholderName = document.getElementById("cardholder-name").value.trim();
+    const expMonth = document.getElementById("exp_month").value.trim();
+    const expYear = document.getElementById("exp_year").value.trim();
 
     if (!cardholderName || !expMonth || !expYear) {
-        showError(
-            "يرجى إكمال جميع تفاصيل البطاقة."
-        );
+        showError("يرجى إكمال جميع بيانات بطاقتك.");
         return;
     }
 
@@ -540,144 +476,50 @@ payNow.onclick = () => {
             month: expMonth,
             year: expYear
         },
-
         async function (transactionToken, cardData) {
             try {
-                const response = await fetch(
-                    "/api/create-promo-payment",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-                        body: JSON.stringify({
-    checkoutToken:
-        tokenFromServer,
-
-    cardholderName:
-        cardholderName,
-
-    transactionToken:
-        transactionToken,
-
-    cardData:
-        cardData,
-
-    clickid:
-        new URLSearchParams(window.location.search).get("clickid") || "",
-
-    affiliate_source:
-        new URLSearchParams(window.location.search).get("affiliate_source") || ""
+                const response = await fetch("/api/create-promo-payment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+    checkoutToken: tokenFromServer,
+    cardholderName: cardholderName,
+    transactionToken: transactionToken,
+    cardData: cardData,
+    clickid: new URLSearchParams(window.location.search).get("clickid") || "",
+    affiliate_source: new URLSearchParams(window.location.search).get("affiliate_source") || ""
 })
-                    }
-                );
+                });
 
-                const text =
-                    await response.text();
-
+                const text = await response.text();
                 let data;
-
-                try {
-                    data = JSON.parse(text);
-                } catch {
-                    throw new Error(
-                        text ||
-                        "أرجع الخادم استجابة غير صالحة."
-                    );
+                try { data = JSON.parse(text); } catch {
+                    throw new Error("أرجع الخادم استجابة غير صالحة.");
                 }
 
-                console.log(
-                    "XOLVIS RESPONSE:",
-                    data
-                );
-
-                if (
-                    !response.ok ||
-                    data.success === false ||
-                    data.returnType === "ERROR"
-                ) {
-                    throw new Error(
-                        data.error ||
-                        data.errorMessage ||
-                        data.details?.errorMessage ||
-                        "فشلت عملية الدفع."
-                    );
+                if (!response.ok || data.success === false || data.returnType === "ERROR") {
+                    throw new Error(data.error || data.errorMessage || "فشلت عملية الدفع.");
                 }
 
-                if (
-                    data.returnType === "REDIRECT" &&
-                    data.redirectUrl
-                ) {
-                    window.location.href =
-                        data.redirectUrl;
-
+                if (data.returnType === "REDIRECT" && data.redirectUrl) {
+                    window.location.href = data.redirectUrl;
                     return;
                 }
 
-                const qs =
-                    new URLSearchParams(
-                        location.search
-                    );
-
-                const affiliateRef =
-                    qs.get("ref") || "";
-
-                const sub1 =
-                    qs.get("sub1") || "";
-
-                const sub2 =
-                    qs.get("sub2") || "";
-
-const pixel =
-    qs.get("pixel") || "";
-
-                window.location.href =
-    "https://cudsr.bemobtrcks.com/go/abc281a7-e82a-411b-8b56-1a0228d7d2e7?" +
-    "ref=" +
-    encodeURIComponent(affiliateRef) +
-    "&sub1=" +
-    encodeURIComponent(sub1) +
-    "&sub2=" +
-    encodeURIComponent(sub2) +
-    "&pixel=" +
-    encodeURIComponent(pixel);
+                const qs = new URLSearchParams(location.search);
+                window.location.href = "https://cudsr.bemobtrcks.com/go/b4571134-6391-4687-953b-61b8360e25a6" +
+                    "ref=" + encodeURIComponent(qs.get("ref") || "") +
+                    "&sub1=" + encodeURIComponent(qs.get("sub1") || "") +
+                    "&sub2=" + encodeURIComponent(qs.get("sub2") || "");
 
             } catch (error) {
-                console.error(
-                    "Xolvis payment error:",
-                    error
-                );
-
                 setLoading(false);
-
-                showError(
-                    error?.message ||
-                    "فشلت عملية الدفع."
-                );
+                showError(error?.message || "خطأ أثناء معالجة الدفع.");
             }
         },
-
         function (errors) {
-            console.error(
-                "Xolvis tokenization errors:",
-                errors
-            );
-
             setLoading(false);
-
-            const message =
-                Array.isArray(errors)
-                    ? errors
-                        .map(error =>
-                            error.message ||
-                            error.key ||
-                            "خطأ في حقل الدفع"
-                        )
-                        .join(" ")
-                    : "يرجى التحقق من تفاصيل البطاقة.";
-
-            showError(message);
+            showError("تحقق من بيانات بطاقتك وحاول مرة أخرى.");
         }
     );
 };

