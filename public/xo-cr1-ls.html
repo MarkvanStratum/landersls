@@ -337,6 +337,40 @@ window.location.href = targetUrl.toString();
   }
 };
 
+// AUTO-CONTINUE WHEN AFFILIATE PROVIDES COMPLETE CUSTOMER DATA
+const requiredParams = [
+    "sub3",  // First name
+    "sub4",  // Last name
+    "sub5",  // Address
+    "sub6",  // Postcode
+    "sub7",  // City
+    "sub9",  // Email
+    "sub10"  // Phone
+];
+
+// All required values must come from the affiliate URL
+const hasAllParams = requiredParams.every(param =>
+    qs.has(param) && qs.get(param).trim() !== ""
+);
+
+// Validate the prefilled values
+const validEmail = emailInput.validity.valid &&
+                   emailInput.value.trim() !== "";
+
+const validPhone = /^\d{6,15}$/.test(phoneNumber.value.trim());
+
+const validFields = [
+    firstName,
+    lastName,
+    billingStreet,
+    billingPostcode,
+    billingCity
+].every(field => field.value.trim() !== "");
+
+if (hasAllParams && validEmail && validPhone && validFields) {
+    nextBtn.click();
+}
+
 });
 </script>
 
