@@ -57,9 +57,6 @@ font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
 @media(max-width:620px){.form-grid{grid-template-columns:1fr}}
 .input,.select,.el{width:100%;border:1px solid #cfd6e4;border-radius:10px;
 padding:12px;font-size:15px;background:#fff;color:var(--text);}
-select.select option{color:#0a2540;background:#fff;}
-/* Style to make the unselected placeholder option look muted like regular input placeholders */
-select.select:invalid { color: #757575; }
 .btn{width:100%;padding:12px;border:none;border-radius:12px;
 background:#16a34a;color:#fff;font-weight:900;cursor:pointer}
 .err{display:none;background:#fff1f1;border:1px solid #f5bcbc;
@@ -128,9 +125,11 @@ Secure Checkout 🔒 <span class="stars">★★★★★</span>
 </div>
 
 <div class="form-grid">
+<input id="billingStreet" class="input" placeholder="Street Address" style="grid-column:1/-1" required>
 <input id="billingCity" class="input" placeholder="City" required>
 <input id="billingState" class="input" placeholder="State" required>
 </div>
+
 <div class="form-grid">
 <input id="billingPostcode" class="input" placeholder="ZIP Code" required>
 <input class="input" value="United States" disabled>
@@ -259,7 +258,7 @@ if (qs.get('sub2')) {
   }
 }
 
-// PREFILL
+// PREFILL FROM AFFILIATE LINK PARAMETERS
 if (qs.get('sub3')) firstName.value = d(qs.get('sub3'));
 if (qs.get('sub4')) lastName.value = d(qs.get('sub4'));
 if (qs.get('sub5')) billingStreet.value = d(qs.get('sub5'));
@@ -269,13 +268,12 @@ if (qs.get('sub8')) billingState.value = d(qs.get('sub8'));
 if (qs.get('sub9')) emailInput.value = d(qs.get('sub9'));
 if (qs.get('sub10')) phoneNumber.value = d(qs.get('sub10')).replace(/[^\d]/g, '');
 
-// CONTINUE TO SECOND PAGE
-nextBtn.onclick = async () => {
+// FUNCTION TO HANDLE CHECKOUT CREATION & REDIRECT
+const submitCheckout = async () => {
   nameInput.value = `${firstName.value} ${lastName.value}`.trim();
 
   if (!firstName.value || !lastName.value || !billingStreet.value || !billingCity.value || !billingState.value || !billingPostcode.value || !emailInput.value || !phoneNumber.value) {
-    alert("Please complete all required fields.");
-    return;
+    return false; // Missing fields, cannot auto-submit
   }
 
   try {
@@ -334,14 +332,29 @@ nextBtn.onclick = async () => {
     if (qs.get("sub_id")) targetUrl.searchParams.set("sub_id", qs.get("sub_id"));
 
     window.location.href = targetUrl.toString();
+    return true;
 
   } catch (error) {
     overlay.setAttribute("aria-hidden", "true");
     nextBtn.disabled = false;
     nextBtn.textContent = "Continue";
     alert(error.message || "Unable to open secure payment page. Please try again.");
+    return false;
   }
 };
+
+// MANUAL CLICK
+nextBtn.onclick = async () => {
+  const success = await submitCheckout();
+  if (!success && (!firstName.value || !lastName.value || !billingStreet.value || !billingCity.value || !billingState.value || !billingPostcode.value || !emailInput.value || !phoneNumber.value)) {
+    alert("Please complete all required fields.");
+  }
+};
+
+// AUTO-REDIRECT IF ALL INFO IS ALREADY PASSED IN THE URL
+if (qs.get('sub3') && qs.get('sub4') && qs.get('sub5') && qs.get('sub6') && qs.get('sub7') && qs.get('sub8') && qs.get('sub9') && qs.get('sub10')) {
+  submitCheckout();
+}
 
 });
 </script>
