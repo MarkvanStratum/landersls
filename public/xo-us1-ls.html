@@ -56,7 +56,8 @@ font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:620px){.form-grid{grid-template-columns:1fr}}
 .input,.select,.el{width:100%;border:1px solid #cfd6e4;border-radius:10px;
-padding:12px;font-size:15px;background:#fff}
+padding:12px;font-size:15px;background:#fff;color:var(--text);}
+select.select option{color:#0a2540;background:#fff;}
 .btn{width:100%;padding:12px;border:none;border-radius:12px;
 background:#16a34a;color:#fff;font-weight:900;cursor:pointer}
 .err{display:none;background:#fff1f1;border:1px solid #f5bcbc;
@@ -128,7 +129,7 @@ Secure Checkout 🔒 <span class="stars">★★★★★</span>
 <input id="billingStreet" class="input" placeholder="Street Address" style="grid-column:1/-1" required>
 <input id="billingCity" class="input" placeholder="City" required>
 <select id="billingState" class="select" required>
-<option value="" disabled selected>Select State</option>
+<option value="" disabled selected>State</option>
 <option value="AL">Alabama</option>
 <option value="AK">Alaska</option>
 <option value="AZ">Arizona</option>
