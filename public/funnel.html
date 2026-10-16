@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Promo Funnel</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f6f8;
+            margin: 0;
+            padding: 30px;
+            color: #222;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .login-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        input {
+            padding: 10px;
+            width: 260px;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 10px 18px;
+            font-size: 15px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .percentage {
+            background: white;
+            padding: 18px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .error {
+            color: #b00020;
+            margin-top: 15px;
+        }
+
+        #results {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Promo Funnel</h1>
+
+    <div class="subtitle">
+        Last 24 hours
+    </div>
+
+    <div class="login-box">
+        <strong>Admin password:</strong>
+        <br><br>
+
+        <input
+            id="adminPassword"
+            type="password"
+            placeholder="Enter admin password"
+        >
+
+        <button id="loadButton">
+            Load results
+        </button>
+
+        <button id="refreshButton">
+            Refresh
+        </button>
+
+        <div
+            id="errorMessage"
+            class="error"
+        ></div>
+    </div>
+
+    <div id="results">
+
+        <div class="grid">
+
+            <div class="card">
+                <div class="label">
+                    Page 1 loaded
+                </div>
+
+                <div
+                    class="value"
+                    id="page1Loaded"
+                >
+                    0
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="label">
+                    Button clicked
+                </div>
+
+                <div
+                    class="value"
+                    id="buttonClicked"
+                >
+                    0
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="label">
+                    Checkout link created
+                </div>
+
+                <div
+                    class="value"
+                    id="checkoutCreated"
+                >
+                    0
+                </div>
+            </div>
+
+            <div class="card">
+    <div class="label">
+        Page 2 loaded
+    </div>
+
+    <div
+        class="value"
+        id="page2Loaded"
+    >
+        0
+    </div>
+</div>
+
+<div class="card">
+    <div class="label">
+        Payment fields ready
+    </div>
+
+    <div
+        class="value"
+        id="paymentFieldsReady"
+    >
+        0
+    </div>
+</div>
+
+<div class="card">
+    <div class="label">
+        Payment init failed
+    </div>
+
+    <div
+        class="value"
+        id="paymentInitFailed"
+    >
+        0
+    </div>
+</div>
+
+<div class="card">
+    <div class="label">
+        Pay button clicked
+    </div>
+
+    <div
+        class="value"
+        id="paymentButtonClicked"
+    >
+        0
+    </div>
+</div>
+
+<div class="card">
+    <div class="label">
+        Payment token created
+    </div>
+
+    <div
+        class="value"
+        id="paymentTokenCreated"
+    >
+        0
+    </div>
+</div>
+
+<div class="card">
+    <div class="label">
+        Payment token failed
+    </div>
+
+    <div
+        class="value"
+        id="paymentTokenFailed"
+    >
+        0
+    </div>
+</div>
+
+<div class="card">
+    <div class="label">
+        Xolvis transaction created
+    </div>
+
+    <div
+        class="value"
+        id="xolvisTransactionCreated"
+    >
+        0
+    </div>
+</div>
+        </div>
+
+        <div class="percentage">
+            <span>
+                Page 1 → Button click
+            </span>
+
+            <strong id="page1ToClick">
+                0%
+            </strong>
+        </div>
+
+        <div class="percentage">
+            <span>
+                Button click → Checkout created
+            </span>
+
+            <strong id="clickToCheckout">
+                0%
+            </strong>
+        </div>
+
+        <div class="percentage">
+            <span>
+                Checkout created → Page 2
+            </span>
+
+            <strong id="checkoutToPage2">
+                0%
+            </strong>
+        </div>
+
+        <div class="percentage">
+            <span>
+                Button click → Page 2
+            </span>
+
+            <strong id="clickToPage2">
+                0%
+            </strong>
+        </div>
+
+<div class="percentage">
+    <span>
+        Page 2 → Payment fields ready
+    </span>
+
+    <strong id="page2ToPaymentFieldsReady">
+        0%
+    </strong>
+</div>
+
+<div class="percentage">
+    <span>
+        Page 2 → Payment init failed
+    </span>
+
+    <strong id="page2ToPaymentInitFailed">
+        0%
+    </strong>
+</div>
+
+<div class="percentage">
+    <span>
+        Page 2 → Pay button click
+    </span>
+
+    <strong id="page2ToPaymentClick">
+        0%
+    </strong>
+</div>
+
+<div class="percentage">
+    <span>
+        Pay button → Token created
+    </span>
+
+    <strong id="paymentClickToToken">
+        0%
+    </strong>
+</div>
+
+<div class="percentage">
+    <span>
+        Pay button → Token failed
+    </span>
+
+    <strong id="paymentTokenFail">
+        0%
+    </strong>
+</div>
+
+<div class="percentage">
+    <span>
+        Token created → Xolvis transaction
+    </span>
+
+    <strong id="tokenToXolvis">
+        0%
+    </strong>
+</div>
+
+<div class="percentage">
+    <span>
+        Pay button → Xolvis transaction
+    </span>
+
+    <strong id="paymentClickToXolvis">
+        0%
+    </strong>
+</div>    
+
+<div
+    style="
+        background:white;
+        padding:20px;
+        margin-top:25px;
+        border-radius:10px;
+        box-shadow:0 2px 10px rgba(0,0,0,0.06);
+    "
+>
+    <h2 style="margin-top:0;">
+        Tokenization Failures
+    </h2>
+
+<button
+    id="downloadTokenFailures"
+    style="
+        margin:0 0 15px 0;
+        padding:10px 16px;
+        cursor:pointer;
+    "
+>
+    Download CSV
+</button>
+
+    <div
+        id="noTokenFailures"
+        style="color:#666;"
+    >
+        No tokenization failures recorded.
+    </div>
+
+    <div
+        style="
+            overflow-x:auto;
+            margin-top:15px;
+        "
+    >
+        <table
+            id="tokenFailureTable"
+            style="
+                width:100%;
+                border-collapse:collapse;
+                display:none;
+                font-size:13px;
+            "
+        >
+            <thead>
+                <tr>
+                    <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd;">
+                        Time
+                    </th>
+
+                    <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd;">
+                        Affiliate
+                    </th>
+
+                    <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd;">
+                        Failure reason
+                    </th>
+
+                    <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd;">
+                        Browser / device
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody id="tokenFailureRows">
+            </tbody>
+        </table>
+    </div>
+</div></div>
+
+</div>
+
+<script>
+
+const passwordInput =
+    document.getElementById(
+        "adminPassword"
+    );
+
+const loadButton =
+    document.getElementById(
+        "loadButton"
+    );
+
+const refreshButton =
+    document.getElementById(
+        "refreshButton"
+    );
+
+const errorMessage =
+    document.getElementById(
+        "errorMessage"
+    );
+
+const results =
+    document.getElementById(
+        "results"
+    );
+
+const savedPassword =
+    sessionStorage.getItem(
+        "funnel_admin_password"
+    );
+
+if (savedPassword) {
+    passwordInput.value =
+        savedPassword;
+}
+
+async function loadFunnelResults() {
+
+    errorMessage.textContent = "";
+
+    const password =
+        passwordInput.value.trim();
+
+    if (!password) {
+        errorMessage.textContent =
+            "Please enter the admin password.";
+
+        return;
+    }
+
+    sessionStorage.setItem(
+        "funnel_admin_password",
+        password
+    );
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/admin/promo-funnel-summary",
+                {
+                    method: "GET",
+
+                    headers: {
+                        "x-admin-password":
+                            password
+                    },
+
+                    cache: "no-store"
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                "Could not load funnel results."
+            );
+        }
+
+        document.getElementById(
+            "page1Loaded"
+        ).textContent =
+            data.page1Loaded;
+
+        document.getElementById(
+            "buttonClicked"
+        ).textContent =
+            data.buttonClicked;
+
+        document.getElementById(
+            "checkoutCreated"
+        ).textContent =
+            data.checkoutCreated;
+
+        document.getElementById(
+    "page2Loaded"
+).textContent =
+    data.page2Loaded;
+
+document.getElementById(
+    "paymentFieldsReady"
+).textContent =
+    data.paymentFieldsReady;
+
+document.getElementById(
+    "paymentInitFailed"
+).textContent =
+    data.paymentInitFailed;
+
+document.getElementById(
+    "paymentButtonClicked"
+).textContent =
+    data.paymentButtonClicked;
+
+document.getElementById(
+    "paymentTokenCreated"
+).textContent =
+    data.paymentTokenCreated;
+
+document.getElementById(
+    "paymentTokenFailed"
+).textContent =
+    data.paymentTokenFailed;
+
+document.getElementById(
+    "xolvisTransactionCreated"
+).textContent =
+    data.xolvisTransactionCreated;
+
+        document.getElementById(
+            "page1ToClick"
+        ).textContent =
+            data.page1ToClickPercent +
+            "%";
+
+        document.getElementById(
+            "clickToCheckout"
+        ).textContent =
+            data.clickToCheckoutPercent +
+            "%";
+
+        document.getElementById(
+            "checkoutToPage2"
+        ).textContent =
+            data.checkoutToPage2Percent +
+            "%";
+
+        document.getElementById(
+            "clickToPage2"
+        ).textContent =
+            data.clickToPage2Percent +
+            "%";
+
+document.getElementById(
+    "page2ToPaymentFieldsReady"
+).textContent =
+    data.page2ToPaymentFieldsReadyPercent +
+    "%";
+
+document.getElementById(
+    "page2ToPaymentInitFailed"
+).textContent =
+    data.page2ToPaymentInitFailedPercent +
+    "%";
+
+document.getElementById(
+    "page2ToPaymentClick"
+).textContent =
+    data.page2ToPaymentClickPercent +
+    "%";
+
+document.getElementById(
+    "paymentClickToToken"
+).textContent =
+    data.paymentClickToTokenPercent +
+    "%";
+document.getElementById(
+    "paymentTokenFail"
+).textContent =
+    data.paymentTokenFailPercent +
+    "%";
+
+document.getElementById(
+    "tokenToXolvis"
+).textContent =
+    data.tokenToXolvisPercent +
+    "%";
+
+document.getElementById(
+    "paymentClickToXolvis"
+).textContent =
+    data.paymentClickToXolvisPercent +
+    "%";
+
+
+const tokenFailureRows =
+    document.getElementById(
+        "tokenFailureRows"
+    );
+
+const tokenFailureTable =
+    document.getElementById(
+        "tokenFailureTable"
+    );
+
+const noTokenFailures =
+    document.getElementById(
+        "noTokenFailures"
+    );
+
+
+tokenFailureRows.innerHTML = "";
+
+
+window.currentTokenFailures =
+    Array.isArray(data.tokenFailures)
+        ? data.tokenFailures
+        : [];
+
+const failures =
+    window.currentTokenFailures;
+
+
+if (failures.length === 0) {
+
+    tokenFailureTable.style.display =
+        "none";
+
+    noTokenFailures.style.display =
+        "block";
+
+} else {
+
+    tokenFailureTable.style.display =
+        "table";
+
+    noTokenFailures.style.display =
+        "none";
+
+
+    failures.forEach(function (failure) {
+
+        const row =
+            document.createElement("tr");
+
+
+        const timeCell =
+            document.createElement("td");
+
+        timeCell.style.padding = "8px";
+        timeCell.style.borderBottom =
+            "1px solid #eee";
+
+        timeCell.textContent =
+            failure.createdAt
+                ? new Date(
+                    failure.createdAt
+                  ).toLocaleString()
+                : "";
+
+
+        const affiliateCell =
+            document.createElement("td");
+
+        affiliateCell.style.padding = "8px";
+        affiliateCell.style.borderBottom =
+            "1px solid #eee";
+
+        affiliateCell.textContent =
+            failure.affiliateRef || "-";
+
+
+        const reasonCell =
+            document.createElement("td");
+
+        reasonCell.style.padding = "8px";
+        reasonCell.style.borderBottom =
+            "1px solid #eee";
+
+        reasonCell.style.maxWidth =
+            "350px";
+
+        reasonCell.style.wordBreak =
+            "break-word";
+
+        reasonCell.textContent =
+            failure.details ||
+            "No error details received";
+
+
+        const browserCell =
+            document.createElement("td");
+
+        browserCell.style.padding = "8px";
+        browserCell.style.borderBottom =
+            "1px solid #eee";
+
+        browserCell.style.maxWidth =
+            "300px";
+
+        browserCell.style.wordBreak =
+            "break-word";
+
+        browserCell.textContent =
+            failure.userAgent || "-";
+
+
+        row.appendChild(timeCell);
+        row.appendChild(affiliateCell);
+        row.appendChild(reasonCell);
+        row.appendChild(browserCell);
+
+        tokenFailureRows.appendChild(row);
+
+    });
+
+}
+
+
+results.style.display =
+    "block";
+
+    } catch (error) {
+
+        results.style.display =
+            "none";
+
+        errorMessage.textContent =
+            error.message ||
+            "Could not load results.";
+    }
+}
+
+const downloadTokenFailuresButton =
+    document.getElementById(
+        "downloadTokenFailures"
+    );
+
+downloadTokenFailuresButton.onclick =
+    function () {
+
+        const failures =
+            Array.isArray(
+                window.currentTokenFailures
+            )
+                ? window.currentTokenFailures
+                : [];
+
+        if (failures.length === 0) {
+
+            alert(
+                "There are no tokenization failure records to download."
+            );
+
+            return;
+        }
+
+
+        function csvValue(value) {
+
+            const text =
+                String(
+                    value === null ||
+                    value === undefined
+                        ? ""
+                        : value
+                );
+
+            return (
+                '"' +
+                text.replace(
+                    /"/g,
+                    '""'
+                ) +
+                '"'
+            );
+        }
+
+
+        const rows = [];
+
+        rows.push([
+            "Time",
+            "Flow ID",
+            "Affiliate",
+            "Failure Reason",
+            "Browser / Device",
+            "Page URL"
+        ]);
+
+
+        failures.forEach(function (failure) {
+
+            rows.push([
+                failure.createdAt
+                    ? new Date(
+                        failure.createdAt
+                      ).toLocaleString()
+                    : "",
+
+                failure.flowId || "",
+
+                failure.affiliateRef || "",
+
+                failure.details || "",
+
+                failure.userAgent || "",
+
+                failure.pageUrl || ""
+            ]);
+
+        });
+
+
+        const csv =
+            rows
+                .map(function (row) {
+
+                    return row
+                        .map(csvValue)
+                        .join(",");
+
+                })
+                .join("\r\n");
+
+
+        const blob =
+            new Blob(
+                [csv],
+                {
+                    type:
+                        "text/csv;charset=utf-8;"
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(blob);
+
+
+        const link =
+            document.createElement("a");
+
+
+        const now =
+            new Date();
+
+
+        const datePart =
+            now
+                .toISOString()
+                .slice(0, 10);
+
+
+        link.href =
+            url;
+
+        link.download =
+            "tokenization-failures-" +
+            datePart +
+            ".csv";
+
+
+        document.body.appendChild(
+            link
+        );
+
+
+        link.click();
+
+
+        document.body.removeChild(
+            link
+        );
+
+
+        URL.revokeObjectURL(
+            url
+        );
+
+    };
+
+loadButton.onclick =
+    loadFunnelResults;
+
+refreshButton.onclick =
+    loadFunnelResults;
+
+if (savedPassword) {
+    loadFunnelResults();
+}
+
+</script>
+
+</body>
+</html>
