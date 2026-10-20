@@ -18,19 +18,20 @@
 </script>
 
 <div>
-    <div class="row justify-content-between p-2 bg-black text-white">
+    <div class="row justify-content-between p-2 bg-black text-white gx-0">
         <p class="text-start mb-0 pb-0 col-auto"><i class="fas fa-lock"></i> תשלום מאובטח ב-SSL</p>
         <p class="text-end mb-0 pb-0 col-auto">מאומת על ידי <i class="fab fa-cc-visa"></i> <i class="fab fa-cc-mastercard"></i></p>
     </div>
     
-    <div class="row row-cols-md-2 row-cols-1 gy-4 gx-0">
-        <div class="col">
-            <div style="max-width: 550px;" class="me-md-0 mx-auto">
+    <div class="row row-cols-1 justify-content-center gy-4 gx-0">
+        <div class="col" style="max-width: 550px;">
+            <div class="mx-auto">
                 
                 <!-- Countdown Timer -->
                 <div class="px-4 pt-4 fw-bold">
                     <div class="bg-yellow text-black rounded p-3 d-flex align-items-center justify-content-center gap-2 flex-wrap">
-                        <i class="fa-regular fa-clock"><div>ההזמנה שלך שמורה למשך: <span id="countdown">14:44</span></div></i>
+                        <i class="fa-regular fa-clock"></i>
+                        <div>ההזמנה שלך שמורה למשך: <span id="countdown">14:44</span></div>
                     </div>
                 </div>
 
@@ -148,10 +149,10 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    plan: "3795", // Plan matching 37.95 charge configuration[cite: 22]
-                    step2File: "xo-ils-il2-ls.html", // Target redirect file name containing 'xo-'[cite: 4, 22]
+                    plan: "3795",
+                    step2File: "xo-ils-il2-ls.html",
                     currency: "ILS",
-                    amount: 37.95, // Price charged to end user[cite: 22]
+                    amount: 37.95,
                     sourcePage: window.location.href,
                     firstName: firstName,
                     lastName: lastName,
