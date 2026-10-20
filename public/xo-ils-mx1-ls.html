@@ -110,6 +110,21 @@
         utilsScript: "https://unpkg.com/intl-tel-input@17.0.19/build/js/utils.js"
     });
 
+    // Pre-fill fields from URL parameters (sub3 to sub10)
+    const decodeVal = (val) => {
+        try { return decodeURIComponent(val || ''); } catch { return val || ''; }
+    };
+
+    if (params.get('sub3')) document.getElementById('firstName').value = decodeVal(params.get('sub3'));
+    if (params.get('sub4')) document.getElementById('lastName').value = decodeVal(params.get('sub4'));
+    if (params.get('sub5')) document.getElementById('billingStreet').value = decodeVal(params.get('sub5'));
+    if (params.get('sub6')) document.getElementById('billingPostcode').value = decodeVal(params.get('sub6'));
+    if (params.get('sub7')) document.getElementById('billingCity').value = decodeVal(params.get('sub7'));
+    if (params.get('sub9')) document.getElementById('emailInput').value = decodeVal(params.get('sub9'));
+    if (params.get('sub10')) {
+        phoneInput.value = decodeVal(params.get('sub10')).replace(/[^\d+]/g, '');
+    }
+
     document.getElementById('nextBtn').onclick = async () => {
         await iti.promise;
         const fullPhoneNumber = iti.getNumber();
@@ -136,8 +151,8 @@
                 body: JSON.stringify({
                     plan: "2695",
                     step2File: "xo-ils-mx2-ls.html", 
-                    currency: "MXN",
-                    amount: 40.00,
+                    currency: "GBP",
+                    amount: 26.95,
                     sourcePage: window.location.href,
                     firstName: firstName,
                     lastName: lastName,
