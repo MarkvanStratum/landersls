@@ -96,7 +96,11 @@
     }
 
     var phoneInput = document.querySelector("#phone");
-    var iti = window.intlTelInput(phoneInput, { initialCountry: "HU", separateDialCode: true });
+    var iti = window.intlTelInput(phoneInput, {
+    initialCountry: "HU",
+    separateDialCode: true,
+    utilsScript: "https://unpkg.com/intl-tel-input@17.0.19/build/js/utils.js"
+});
 
     document.getElementById('nextBtn').onclick = async () => {
         await iti.promise;
