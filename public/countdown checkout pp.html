@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Secure Payment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
+    <link rel="stylesheet" type="text/css" href="https://vantorisprocurementstudio.sbs/storage/2dc77142-10c0-4e40-b99d-0da8eaf59c2c/styles.css?v=1afd2547586945f9264c32c2da52c4937af6ea67">
+    <link rel="stylesheet" type="text/css" href="https://designdecor.store/storage/8a3fa44b-8224-47ea-849a-ecd5ed5fd618/style-default.css?v=d0056881557fa20ee5be10570ed94311acf2dba2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://use.typekit.net/iqg0vee.css">
+    <link href="https://unpkg.com/intl-tel-input@17.0.19/build/css/intlTelInput.min.css" rel="stylesheet">
+    <style>
+      .payment-card-form{width:100%}
+      .payment-card-form .wpwl-group{margin-bottom:14px}
+      .payment-card-form .wpwl-label{display:block;margin-bottom:6px}
+      .payment-card-form .wpwl-control{display:block;width:100%;height:46px;padding:10px 12px;background:#fff;color:#212529}
+      .payment-card-form .payment-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+      .payment-card-form .wpwl-button-pay{margin-top:4px;min-height:48px;height:auto!important}
+      .payment-card-form .payment-brands{display:flex;justify-content:flex-end;gap:6px;margin-bottom:12px}
+      .payment-card-form .payment-brand{border:1px solid #d9dce1;border-radius:4px;padding:3px 8px;background:#fff;font-size:11px;font-weight:800}
+      .payment-card-form .field-error{display:none;color:#b42318;font-size:12px;margin-top:5px}
+      .payment-card-form.was-validated .wpwl-control:invalid{border-color:#dc3545!important}
+      #payment-demo-message{display:none;margin-top:12px}
+      @media(max-width:480px){.payment-card-form .payment-row{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+
+    
+    
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
+    <link href="https://designdecor.store/storage/8a3fa44b-8224-47ea-849a-ecd5ed5fd618/style-default.css?v=d0056881557fa20ee5be10570ed94311acf2dba2" rel="stylesheet">
+
+    <style>
+        html, body {
+            overflow-x: hidden;
+        }
+
+        .btn-primary {
+            background: #10881a !important;
+            border-color: #10881a !important;
+        }
+
+        .pointer {
+            cursor: pointer;
+        }
+
+        .fs-09 {
+            font-size: 0.9rem;
+        }
+
+        @media (width >= 768px) {
+            #order-summary-mobile {
+                display: none !important;
+            }
+        }
+
+        .bg-yellow {
+            background-color: #FFDD00;
+        }
+
+        p {
+            width: unset !important;
+        }
+
+        .wpwl-button-pay, .btn-success, #c2pSubmitButton {
+            background-color: #198754!important;
+            background: #198754!important;
+            color: white!important;
+            border: none!important;
+            text-transform: uppercase!important;
+            transition: all .4s;
+            font-size: 1.25rem !important;
+            width: 100%!important;
+            border-radius: 15px!important;
+            height: 42px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wpwl-label, label {
+            font-weight: 600 !important;
+            font-size: small !important;
+        }
+        .wpwl-control {
+            border-radius: .375rem !important;
+            border: 1px solid #dee2e6 !important;
+        }
+
+        .card-image, .cvv-image {
+            display: none !important;
+        }
+
+    </style>
+
+    <div>
+        <div class="row justify-content-between p-2 bg-black text-white">
+            <p class="text-left mb-0 pb-0 col-auto">
+                <i class="fas fa-lock"></i> SSL safe payment
+            </p>
+            <p class="text-right mb-0 pb-0 col-auto">
+                Verified by <i class="fab fa-cc-visa"></i> <i class="fab fa-cc-mastercard"></i>
+            </p>
+        </div>
+        <div class="row row-cols-md-2 row-cols-1 gy-4 gx-0">
+            <div class="col">
+                <div style="max-width: 550px;" class="me-md-0 mx-auto">
+
+                    <div class="d-md-none bg-light d-flex align-items-center justify-content-between px-4 py-3" id="show-order-summary">
+                        <div class="fs-09">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#50709f" class="bi bi-cart3" viewBox="0 0 16 16">
+                                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l.84 4.479 9.144-.459L13.89 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"></path>
+                            </svg>
+                            <span style="color: #50709f">
+                                Show the order summary <i class="fa-solid fa-chevron-down"></i>
+                            </span>
+                        </div>
+                        <p class="mb-0 fw-bold">
+                            108.00€
+                        </p>
+                    </div>
+                    <div class="p-3 border-bottom" id="order-summary-mobile">
+                            <h4 class="text-start">Order summary</h4>
+    <table class="w-100 mt-3">
+        <tbody><tr class="border-top py-4">
+            <td class="w-50 pt-3">
+                Subtotal
+            </td>
+            <td class="w-50 text-end fw-bold pt-3">
+                108.00€
+            </td>
+        </tr>
+        <tr>
+            <td class="w-50">
+                Shipping
+            </td>
+            <td class="w-50 text-end pb-3">
+                <span class="d-block">
+                    Free
+                </span>
+            </td>
+        </tr>
+        <tr class="border-top">
+            <td class="w-50 fw-bold pt-3">
+                Total
+            </td>
+            <td class="w-50 text-end pt-3 fw-bold fs-4">
+                108.00€
+            </td>
+        </tr>
+    </tbody></table>
+    
+                    </div>
+
+                    <div class="px-4 pt-4 pt-md-3 fw-bold">
+                        <div class="bg-yellow text-black rounded p-3 d-flex align-items-center justify-content-center gap-2 flex-wrap">
+                            <i class="fa-regular fa-clock"></i>
+                            <div>
+                                Your order is reserved for: <span id="countdown">14:28</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row row-cols-3 rounded-pill gx-0 p-4">
+                        <div class="col text-center">
+                            <p class="mb-0">
+                                Cart
+                            </p>
+                            <div class="rounded-start-pill" style="height: 20px; background-color: #000; border: 1px solid #000"></div>
+                        </div>
+                        <div class="col text-center">
+                            <p class="mb-0">
+                                Information
+                            </p>
+                            <div class="progress-box border-start-0 border-end-0" style="height: 20px; background-color: #000; border: 1px solid #000" data-progress="1"></div>
+                        </div>
+                        <div class="col text-center">
+                            <p class="mb-0">
+                                Payment
+                            </p>
+                            <div class="rounded-end-pill border-dark border progress-box" style="height: 20px; background-color: #ccc" data-progress="2"></div>
+                        </div>
+                    </div>
+                    <div class="p-4 py-2 py-sm-3">
+                            <div id="payframe-po">
+    <form id="payment-card-form" class="wpwl-form wpwl-form-card payment-card-form" novalidate>
+      <div class="payment-brands" aria-label="Accepted cards">
+        <span class="payment-brand">VISA</span><span class="payment-brand">MASTERCARD</span>
+      </div>
+      <div class="wpwl-group wpwl-group-cardHolder">
+        <label class="wpwl-label" for="card-holder">Card holder</label>
+        <input class="wpwl-control" id="card-holder" placeholder="Card holder" type="text" autocomplete="cc-name" required maxlength="80">
+      </div>
+      <div class="wpwl-group wpwl-group-cardNumber">
+        <label class="wpwl-label" for="card-number">Card number</label>
+        <input class="wpwl-control" id="card-number" placeholder="Card number" type="text" inputmode="numeric" autocomplete="cc-number" required minlength="15" maxlength="19">
+      </div>
+      <div class="payment-row">
+        <div class="wpwl-group wpwl-group-expiry">
+          <label class="wpwl-label" for="card-expiry">Expiry date</label>
+          <input class="wpwl-control" id="card-expiry" placeholder="MM / YY" type="text" inputmode="numeric" autocomplete="cc-exp" required maxlength="7">
+        </div>
+        <div class="wpwl-group wpwl-group-cvv">
+          <label class="wpwl-label" for="card-cvv">CVV</label>
+          <input class="wpwl-control" id="card-cvv" placeholder="CVV" type="password" inputmode="numeric" autocomplete="cc-csc" required minlength="3" maxlength="4">
+        </div>
+      </div>
+      <button class="wpwl-button wpwl-button-pay" type="submit">Pay now</button>
+      <div class="alert alert-warning" id="payment-demo-message" role="status">The payment form is ready visually. Connect a fresh hosted payment-provider session before accepting a real payment.</div>
+    </form>
+    <div class="footer text-center mt-3">
+      <p class="mb-2">Secure card payment</p>
+      <div class="d-flex justify-content-center gap-2"><span class="payment-brand">VISA</span><span class="payment-brand">MASTERCARD</span></div>
+    </div>
+  </div>
+  <pre hidden="">landing</pre>
+  <script>
+    (function () {
+      const form = document.getElementById('payment-card-form');
+      if (!form) return;
+      const number = document.getElementById('card-number');
+      const expiry = document.getElementById('card-expiry');
+      const cvv = document.getElementById('card-cvv');
+      number.addEventListener('input', function () {
+        const digits = this.value.replace(/\D/g, '').slice(0, 16);
+        this.value = digits.replace(/(.{4})/g, '$1 ').trim();
+      });
+      expiry.addEventListener('input', function () {
+        const digits = this.value.replace(/\D/g, '').slice(0, 4);
+        this.value = digits.length > 2 ? digits.slice(0, 2) + ' / ' + digits.slice(2) : digits;
+      });
+      cvv.addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 4); });
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        form.classList.add('was-validated');
+        if (!form.checkValidity()) { form.reportValidity(); return; }
+        document.getElementById('payment-demo-message').style.display = 'block';
+      });
+    })();
+  </script>
+            <div class="modal" id="preflightModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h1 style="text-align: center; font-size: 26px;margin-bottom:20px">Secure Payment</h1>
+
+                        <div class="alert alert-danger">
+                            <p class="text-center">
+                                <strong>There was an error while handling the payment!</strong>
+                            </p>
+                            <hr>
+                            <div style="display: flex;align-items: center;">
+                                <img src="https://designdecor.store/storage/4e6b9c9e-f355-4daf-8c46-b2ea72256715/ca.webp?v=884f56e8b03acff507178676a97a74d3279a205e" class="img-fluid" alt="ca" style="max-height:70px; border-radius:50%;margin-right:15px">
+                                <p class="text-left" style="margin:0;">
+                                    An agent from our payments department will call you shortly to help you process the payment.
+                                </p>
+                            </div>
+                            <hr>
+                            <div>
+                                <p>Possible reasons:</p>
+                                <ul>
+                                    <li>Invalid credit card number, card holder, CVV or expiration date</li>
+                                    <li>Insufficient funds</li>
+                                    <li>Credit card has limits for internet payments or some other restrictions..</li>
+                                </ul>
+
+                                                                    <p class="suggest" hidden="">
+                                        <a href="#" type="button" class="btn btn-success" style="width: 100%; margin-top: 20px;">Please, try again</a>
+                                    </p>
+                                                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+                <div class="modal fade show" id="modalTerms" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" style="height: 600px;">
+                        <iframe loading="lazy" width="100%" height="100%" frameborder="0" src="https://virelcommercecircuitcentre.info/c/ThPXSxYZvTqg/conditions"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+
+                        <div style="width:100%; text-align:center;">
+                            <img src="https://designdecor.store/storage/public/payment_icons/visa-master.png" alt="Visa-Mastercard" height="33px" class="mt-3">
+                            <hr>
+                        
+                        </div>
+
+                                                <div class="d-none align-items-start" style="gap: 5px">
+                            <input type="checkbox" class="mt-1" name="cross-sell-purchase" id="cross-sell-purchase" checked="" hidden="">
+                            <label for="cross-sell-purchase" style="font-size:10px;text-align:justify;text-align: justify;color: #716c6c;">
+                                I consent and accept the conditions of the membership and would like a secondary membership. 2x recurring payments every 14 days, current rate (69.3 €). Cancel anytime.
+                            </label>
+                        </div>
+                                            </div>
+                </div>
+            </div>
+            <div class="col p-4 bg-light border-start min-vh-100">
+                <div style="max-width: 500px;" class="ms-md-0 mx-auto">
+                    <div class="d-none d-md-block">
+                            <h4 class="text-start">Order summary</h4>
+    <table class="w-100 mt-3">
+        <tbody><tr class="border-top py-4">
+            <td class="w-50 pt-3">
+                Subtotal
+            </td>
+            <td class="w-50 text-end fw-bold pt-3">
+                108.00€
+            </td>
+        </tr>
+        <tr>
+            <td class="w-50">
+                Shipping
+            </td>
+            <td class="w-50 text-end pb-3">
+                <span class="d-block">
+                    Free
+                </span>
+            </td>
+        </tr>
+        <tr class="border-top">
+            <td class="w-50 fw-bold pt-3">
+                Total
+            </td>
+            <td class="w-50 text-end pt-3 fw-bold fs-4">
+                108.00€
+            </td>
+        </tr>
+    </tbody></table>
+    
+                    </div>
+                    <div class="pt-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="height: 1px; background: #ccc" class="w-100"></div>
+                            <p class="mb-0 text-center fw-bold" style="min-width: 150px;">
+                                Why should you buy from us?
+                            </p>
+                            <div style="height: 1px; background: #ccc" class="w-100"></div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="https://designdecor.store/storage/757bdc58-b049-4d0b-baf8-d006ead598c1/icon1.webp?v=8c9760c3bdee8ee8d5a813ea25c3b609abbb0333" width="100" alt="">
+                            <div class="fs-09">
+                                <p class="mb-0 fw-bold">
+                                    100% satisfaction guarantee
+                                </p>
+                                <p class="mb-0">
+                                    If you are not 100% satisfied with your purchase, we will do what is necessary to rectify it!
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 mt-3">
+                            <img src="https://designdecor.store/storage/7e0f7283-46ff-4c9f-9371-67fbfce7a174/icon2.webp?v=99aa7ed02b667467301179ce587fdedbf415d5f9" width="100" alt="">
+                            <div class="fs-09">
+                                <p class="mb-0 fw-bold">
+                                    Thousands of orders successfully shipped!
+                                </p>
+                                <p class="mb-0">
+                                    We have made as many customers happy as the number of orders we have shipped. You just have to join our big family.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                                                
+                                            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+        </div>
+        <div class="banner col-12">
+            <button type="button" data-toggle="modal" data-bs-toggle="modal" data-target="#modalPrivacy" data-bs-target="#modalPrivacy" class="btn p-0 text-body" style="font-size:12px;opacity:.8;">
+                Privacy policy
+            </button>
+        </div>
+    </div>
+        <div class="modal fade" id="modalPrivacy" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body h-auto">
+                                        <style>
+    .rtl {
+		unicode-bidi: bidi-override;
+		direction: rtl;
+	}
+</style>
+
+
+    
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;1c9dc3ee63a9452894759ad0562d8d82&quot;,&quot;r&quot;:1,&quot;spa&quot;:2}" crossorigin="anonymous"></script>
+
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
+<script>
+    const checkbox = document.getElementById("cross-sell-purchase");
+    localStorage.setItem("enable-cross-payment", "true");
+    if (checkbox) {
+        checkbox.addEventListener("change", function() {
+            if (checkbox.checked) {
+                localStorage.setItem("enable-cross-payment", "true");
+            } else {
+                localStorage.removeItem("enable-cross-payment");
+            }
+        });
+    }
+</script>
+
+<script>
+    var swiper = new Swiper(".swiperReviews", {
+        pagination: {
+            el: ".swiper-pagination",
+        },
+    });
+</script>
+
+<script>
+    var cvvInterval = setInterval(function() {
+        if ($('.wpwl-control-cvv').length >= 1) {
+            $('.wpwl-control-cvv').after(`<img height="42" class="cvv-image d-flex ml-auto ms-auto me-2 mr-2" src="https://designdecor.store/storage/3e388b14-f7f6-40cd-b552-a5ac5597063c/cvv-icon-v2.jpg?v=c9a2a834ead4e1c429edef36da2221d56dbc4fe3" />`);
+            clearInterval(cvvInterval);
+        }
+    }, 100);
+
+    var cardNumberInterval = setInterval(function() {
+        if ($('.wpwl-control-cardNumber').length >= 1) {
+            $('.wpwl-control-cardNumber').after(`<img class="card-image d-flex ml-auto ms-auto me-2 mr-2" src="https://designdecor.store/storage/a352726d-2626-44c1-a709-f8f6912802da/cards-v3.png?v=77f1eba5b4e99e70996ec9b46645b90bc454fcce" />`);
+            clearInterval(cardNumberInterval);
+        }
+    }, 100);
+</script>
+
+<script>
+    const observer = new MutationObserver((mutations, observer) => {
+        const element = document.getElementsByName("card.holder")[0];
+        if (element) {
+            element.value = 'Sdqsd Qsdqsd';
+            observer.disconnect();
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+</script>
+
+<script>
+    $('#show-order-summary').click(function () {
+        $('#order-summary-mobile').slideToggle();
+    });
+</script>
+
+<script>
+    function startTimer(duration, display) {
+        let timer = duration,
+        minutes,
+        seconds;
+        setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+            minutes = minutes < 10 ? "0" + minutes: minutes;
+            seconds = seconds < 10 ? "0" + seconds: seconds;
+            display.textContent = minutes + ":" + seconds;
+            if (--timer < 0) {
+                timer = 0; // Timer reached zero
+            }
+        },
+            1000);
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+        let fifteenMinutes = 60 * 15; // 15 minutes in seconds
+        let display = document.querySelector('#countdown');
+        startTimer(fifteenMinutes,
+            display);
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+</body>
+</html>
