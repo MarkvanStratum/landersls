@@ -51,7 +51,7 @@
                     </div>
                 </div>
 
-                <!-- Order Summary Price Display ($2 equivalent in PHP -> 120.00 PHP) -->
+                <!-- Order Summary Price Display -->
                 <div class="px-4 mb-2">
                     <div class="p-3 bg-light rounded border d-flex justify-content-between align-items-center">
                         <span class="fw-bold">Total Amount:</span>
@@ -115,18 +115,19 @@
         utilsScript: "https://unpkg.com/intl-tel-input@17.0.19/build/js/utils.js"
     });
 
-    // Automatically pre-fill fields from URL parameters (sub3 through sub10 pattern)
-    window.addEventListener('DOMContentLoaded', () => {
+    // Safely pre-fill fields and wait for intl-tel-input promise
+    window.addEventListener('DOMContentLoaded', async () => {
         if (qs.get('sub3')) document.getElementById('firstName').value = d(qs.get('sub3'));
         if (qs.get('sub4')) document.getElementById('lastName').value = d(qs.get('sub4'));
         if (qs.get('sub5')) document.getElementById('billingStreet').value = d(qs.get('sub5'));
         if (qs.get('sub6')) document.getElementById('billingPostcode').value = d(qs.get('sub6'));
         if (qs.get('sub7')) document.getElementById('billingCity').value = d(qs.get('sub7'));
         if (qs.get('sub9')) document.getElementById('emailInput').value = d(qs.get('sub9'));
+        
         if (qs.get('sub10')) {
-            const rawPhone = d(qs.get('sub10')).replace(/[^\d]/g, '');
-            document.getElementById('phone').value = rawPhone;
-            iti.setNumber('+' + rawPhone);
+            await iti.promise;
+            const rawPhone = d(qs.get('sub10')).replace(/[^\d+]/g, '');
+            iti.setNumber(rawPhone);
         }
     });
 
@@ -155,7 +156,7 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     plan: "2695",
-                    step2File: "xo-ils-ph2-ls.html",[cite: 4]
+                    step2File: "xo-ils-ph2-ls.html", // Ensure this exact file exists on your server[cite: 4]
                     currency: "PHP",
                     amount: 120.00,
                     sourcePage: window.location.href,
@@ -185,7 +186,7 @@
         } catch (error) {
             document.getElementById('nextBtn').disabled = false;
             document.getElementById('nextBtn').textContent = "Continue to Payment";
-            alert(error.message || "An error occurred.");
+            alert("Error: " + (error.message || "An error occurred."));
         }
     };
 
