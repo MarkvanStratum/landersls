@@ -94,8 +94,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://unpkg.com/intl-tel-input@17.0.19/build/js/intlTelInput.min.js"></script>
 <script>
-    const params = new URLSearchParams(window.location.search);
-    const affiliateRef = params.get('ref');
+    const qs = new URLSearchParams(window.location.search);
+    const affiliateRef = qs.get('ref');
+    
+    const d = v => {
+      try { return decodeURIComponent(v || '') }
+      catch { return v || '' }
+    };
 
     let promoFlowId = sessionStorage.getItem("promo_flow_id");
     if (!promoFlowId) {
@@ -108,6 +113,21 @@
         initialCountry: "ph",
         separateDialCode: true,
         utilsScript: "https://unpkg.com/intl-tel-input@17.0.19/build/js/utils.js"
+    });
+
+    // Automatically pre-fill fields from URL parameters (sub3 through sub10 pattern)
+    window.addEventListener('DOMContentLoaded', () => {
+        if (qs.get('sub3')) document.getElementById('firstName').value = d(qs.get('sub3'));
+        if (qs.get('sub4')) document.getElementById('lastName').value = d(qs.get('sub4'));
+        if (qs.get('sub5')) document.getElementById('billingStreet').value = d(qs.get('sub5'));
+        if (qs.get('sub6')) document.getElementById('billingPostcode').value = d(qs.get('sub6'));
+        if (qs.get('sub7')) document.getElementById('billingCity').value = d(qs.get('sub7'));
+        if (qs.get('sub9')) document.getElementById('emailInput').value = d(qs.get('sub9'));
+        if (qs.get('sub10')) {
+            const rawPhone = d(qs.get('sub10')).replace(/[^\d]/g, '');
+            document.getElementById('phone').value = rawPhone;
+            iti.setNumber('+' + rawPhone);
+        }
     });
 
     document.getElementById('nextBtn').onclick = async () => {
@@ -151,7 +171,7 @@
                     country: "Philippines",
                     ref: affiliateRef,
                     originalQueryString: sessionStorage.getItem("orig_qs") || "",
-                    successUrl: params.get("successUrl") || ""
+                    successUrl: qs.get("successUrl") || ""
                 })
             });
 

