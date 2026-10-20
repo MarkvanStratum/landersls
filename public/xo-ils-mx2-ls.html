@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Secure Payment — Step 2 (Mexico)</title>
+<title>Pago Seguro — Paso 2 (México)</title>
 <meta name="referrer" content="no-referrer">
 
 <!-- Xolvis Integration Script -->
@@ -30,60 +30,60 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui
 
 <body>
 
-<div class="safe">Secure SSL Encrypted Payment</div>
+<div class="safe">Pago seguro con cifrado SSL</div>
 
 <div class="wrap">
     <!-- Countdown Timer Element -->
     <div class="fw-bold mb-4">
         <div class="bg-yellow text-black rounded p-3 d-flex align-items-center justify-content-center gap-2">
             <i class="fa-regular fa-clock"></i>
-            <div>Your order is reserved for: <span id="countdown">14:28</span></div>
+            <div>Tu pedido está reservado por: <span id="countdown">14:28</span></div>
         </div>
     </div>
 
     <div class="card">
-        <h2 style="font-size: 18px; font-weight: 800; margin-bottom: 14px;">2. Payment Method (Xolvis Pay)</h2>
-        <p style="font-size: 13px; color: #5b6b82;">Your card details are encrypted and processed securely.</p>
+        <h2 style="font-size: 18px; font-weight: 800; margin-bottom: 14px;">2. Método de pago (Xolvis Pay)</h2>
+        <p style="font-size: 13px; color: #5b6b82;">Los datos de tu tarjeta están cifrados y se procesan de forma segura.</p>
 
         <div style="margin-top:14px;">
-            <label for="cardholder-name" style="display:block;font-weight:700;margin-bottom:6px;">Cardholder Full Name</label>
-            <input type="text" id="cardholder-name" class="el" placeholder="John Doe" autocomplete="cc-name" required>
+            <label for="cardholder-name" style="display:block;font-weight:700;margin-bottom:6px;">Nombre completo del titular de la tarjeta</label>
+            <input type="text" id="cardholder-name" class="el" placeholder="Juan Pérez" autocomplete="cc-name" required>
         </div>
 
         <div style="margin-top:14px;">
-            <label style="display:block;font-weight:700;margin-bottom:6px;">Card Number</label>
+            <label style="display:block;font-weight:700;margin-bottom:6px;">Número de tarjeta</label>
             <div id="number_div" style="height:46px;border:1px solid #cfd6e4;border-radius:10px;padding:6px;background:#fff;"></div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
             <div>
-                <label for="exp_month" style="display:block;font-weight:700;margin-bottom:6px;">Expiry Month</label>
+                <label for="exp_month" style="display:block;font-weight:700;margin-bottom:6px;">Mes de caducidad</label>
                 <input type="text" id="exp_month" class="el" placeholder="MM" inputmode="numeric" maxlength="2" required>
             </div>
             <div>
-                <label for="exp_year" style="display:block;font-weight:700;margin-bottom:6px;">Expiry Year</label>
-                <input type="text" id="exp_year" class="el" placeholder="YYYY" inputmode="numeric" maxlength="4" required>
+                <label for="exp_year" style="display:block;font-weight:700;margin-bottom:6px;">Año de caducidad</label>
+                <input type="text" id="exp_year" class="el" placeholder="AAAA" inputmode="numeric" maxlength="4" required>
             </div>
         </div>
 
         <div style="margin-top:14px;">
-            <label style="display:block;font-weight:700;margin-bottom:6px;">Security Code (CVV)</label>
+            <label style="display:block;font-weight:700;margin-bottom:6px;">Código de seguridad (CVV)</label>
             <div id="cvv_div" style="height:46px;border:1px solid #cfd6e4;border-radius:10px;padding:6px;background:#fff;"></div>
         </div>
 
         <div id="err" class="err" aria-hidden="true"></div>
 
         <div style="display:flex;gap:10px;margin-top:16px">
-            <button id="backBtn" class="btn" style="background:#6c757d;width:40%">Back</button>
-            <button id="payNow" class="btn" style="width:60%" disabled>Secure Payment (40.00 MXN)</button>
+            <button id="backBtn" class="btn" style="background:#6c757d;width:40%">Atrás</button>
+            <button id="payNow" class="btn" style="width:60%" disabled>Pago seguro (40.00 MXN)</button>
         </div>
     </div>
 </div>
 
 <div id="loading-overlay" class="loading-overlay" aria-hidden="true">
     <div style="background:#fff;padding:24px;border-radius:14px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-        <h4 style="font-size:18px;font-weight:800;margin-bottom:10px;">Processing payment…</h4>
-        <p style="color:#5b6b82;font-size:13px;">Please wait a few seconds…</p>
+        <h4 style="font-size:18px;font-weight:800;margin-bottom:10px;">Procesando pago…</h4>
+        <p style="color:#5b6b82;font-size:13px;">Por favor, espera unos segundos…</p>
     </div>
 </div>
 
@@ -116,7 +116,7 @@ function setLoading(isLoading) {
 
 window.addEventListener("DOMContentLoaded", () => {
     if (!tokenFromServer || !publicIntegrationKey) {
-        showError("Invalid payment link or missing configuration.");
+        showError("Enlace de pago no válido o configuración faltante.");
         return;
     }
 
@@ -129,12 +129,12 @@ window.addEventListener("DOMContentLoaded", () => {
             function (paymentInstance) {
                 paymentReady = true;
                 payNow.disabled = false;
-                paymentInstance.setNumberPlaceholder("Card number");
+                paymentInstance.setNumberPlaceholder("Número de tarjeta");
                 paymentInstance.setCvvPlaceholder("CVV");
             }
         );
     } catch (error) {
-        showError("Failed to load secure payment fields.");
+        showError("No se pudieron cargar los campos de pago seguro.");
     }
 });
 
@@ -143,7 +143,7 @@ backBtn.onclick = () => { window.history.back(); };
 payNow.onclick = () => {
     clearError();
     if (!paymentReady || !payment) {
-        showError("Payment fields are still loading. Please wait.");
+        showError("Los campos de pago aún se están cargando. Por favor, espera.");
         return;
     }
 
@@ -152,7 +152,7 @@ payNow.onclick = () => {
     const expYear = document.getElementById("exp_year").value.trim();
 
     if (!cardholderName || !expMonth || !expYear) {
-        showError("Please provide all required card details.");
+        showError("Por favor, introduce todos los datos obligatorios de la tarjeta.");
         return;
     }
 
@@ -178,7 +178,7 @@ payNow.onclick = () => {
 
                 const data = await response.json();
                 if (!response.ok || data.success === false || data.returnType === "ERROR") {
-                    throw new Error(data.error || data.errorMessage || "Payment failed.");
+                    throw new Error(data.error || data.errorMessage || "El pago ha fallado.");
                 }
 
                 if (data.returnType === "REDIRECT" && data.redirectUrl) {
@@ -191,15 +191,15 @@ payNow.onclick = () => {
                     return;
                 }
 
-                throw new Error("Could not verify payment status.");
+                throw new Error("No se pudo verificar el estado del pago.");
             } catch (error) {
                 setLoading(false);
-                showError(error?.message || "An error occurred during payment processing.");
+                showError(error?.message || "Ocurrió un error durante el procesamiento del pago.");
             }
         },
         function (errors) {
             setLoading(false);
-            showError("Please check your card details and try again.");
+            showError("Por favor, comprueba los datos de tu tarjeta e inténtalo de nuevo.");
         }
     );
 };
